@@ -1,0 +1,42 @@
+{
+    "recipe_name": "Teste Integrado Ports and Adapters",
+    "version": "1.0.0",
+    "target_format": "docx",
+    "style": {
+        "reference_docx": "engine/src/doc_engine/storage/styles/reference.docx",
+        "include_header": true,
+        "include_footer": true
+    },
+    "components": [
+        {
+            "id": "cover",
+            "type": "template",
+            "source": "engine/src/doc_engine/storage/components/cover.md",
+            "file_format": "md"
+        },
+        {
+            "id": "corpo_tecnico",
+            "type": "template",
+            "source": "engine/src/doc_engine/storage/components/specifications.md",
+            "file_format": "md"
+        },
+        {
+            "id": "tabela_sondagem",
+            "type": "external",
+            "source": "engine/src/doc_engine/storage/components/dados_cdr.xlsx",
+            "file_format": "xlsx"
+        },
+        {
+            "id": "min",
+            "type": "external",
+            "source": "engine/src/doc_engine/storage/components/min.pdf",
+            "file_format": "pdf"
+        },
+        {
+            "id": "cubacao",
+            "type": "external",
+            "source": "engine/src/doc_engine/storage/components/quadros_cub.docx",
+            "file_format": "docx"
+        }
+    ]
+}

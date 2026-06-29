@@ -1,0 +1,14 @@
+{
+  "document_name": "Relatório de Engenharia Estrutural",
+  "generation_timestamp": "2026-06-28T23:24:41.834163",
+  "engine_version": "1.4.2",
+  "target_format": "pdf",
+  "injected_parameters": {
+    "project_title": "fsfs"
+  },
+  "compiled_markdown_source": "engine/src/doc_engine/output\\document_distribution.md",
+  "generated_resources": [
+    "engine/src/doc_engine/output\\resources\\min_page_1.png",
+    "engine/src/doc_engine/output\\resources\\rendered_diagram_1.png"
+  ]
+}

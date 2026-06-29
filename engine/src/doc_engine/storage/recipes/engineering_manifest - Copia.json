@@ -1,0 +1,21 @@
+{
+    "recipe_name": "Standard Engineering Report Layout",
+    "version": "1.0.0",
+    "style": {
+        "reference_docx": "engine/src/doc_engine/storage/styles/reference.docx",
+        "include_header": true,
+        "include_footer": true
+    },
+    "components": [
+        {
+            "id": "cover_page",
+            "type": "template",
+            "source": "engine/src/doc_engine/storage/components/cover.md"
+        },
+        {
+            "id": "specifications_sheet",
+            "type": "template",
+            "source": "engine/src/doc_engine/storage/components/specifications.md"
+        }
+    ]
+}

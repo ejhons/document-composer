@@ -1,0 +1,30 @@
+{
+  "tabela_sondagem": {
+    "hash": "dbd02a3e7a8a3ce90ffc93cae35bff4ab9dc138a5c2e54c77f86541c124471bb",
+    "updated_at": null,
+    "outputs": [
+      "engine/src/doc_engine/output\\resources\\dados_cdr_page_1.png"
+    ]
+  },
+  "min": {
+    "hash": "da87357207e5a07119ebc286967eb6ae2cefd41679fab1ceceadf13bd0f549bb",
+    "updated_at": 1782695113.7827516,
+    "outputs": [
+      "engine/src/doc_engine/output\\resources\\min_page_1.png"
+    ]
+  },
+  "cubacao": {
+    "hash": "8c51de910076f1ac06e7f94f04fd49fe04a9dfb4c96b2cf95c880b24c2467ad3",
+    "updated_at": 1782695113.2894752,
+    "outputs": [
+      "engine/src/doc_engine/output\\resources\\quadros_cub_page_1.png"
+    ]
+  },
+  "mermaid_diagram_1": {
+    "hash": "2f4b841dc94a9b1cdb1964af2a71e2619d7626548ded7b1fffc12286c8034fd8",
+    "updated_at": 1782695113.2906513,
+    "outputs": [
+      "engine/src/doc_engine/output\\resources\\rendered_diagram_1.png"
+    ]
+  }
+}

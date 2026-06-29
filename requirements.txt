@@ -1,0 +1,16 @@
+# requirements.txt atualizado
+jinja2>=3.1.2
+pydantic>=2.0.0
+pyyaml>=6.0
+pypandoc>=1.13
+python-docx>=1.1.0    # Para manipular e mesclar arquivos Word
+pandas>=2.0.0         # Para converter Excel (.xlsx) em tabelas de forma simples
+openpyxl>=3.1.0       # Engine de leitura para o Pandas abrir arquivos Excel
+pypdf>=4.0.0          # Para a união final de relatórios com anexos em PDF
+pytest
+request>=2.31.0
+tabulate
+pypdfium2 
+pillow
+rich
+xhtml2pdf

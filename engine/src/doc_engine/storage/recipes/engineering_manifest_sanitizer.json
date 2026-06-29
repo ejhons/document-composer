@@ -1,0 +1,29 @@
+{
+    "recipe_name": "Relatório Estrutural Avançado",
+    "version": "2.1.0",
+    "target_format": "html",
+    "style": {
+        "reference_docx": "storage/styles/reference.docx",
+        "include_header": true,
+        "include_footer": true,
+        "header_text_left": "M&A Engenharia Associados",
+        "header_text_right": "Cálculo de Infraestrutura",
+        "footer_text_left": "Uso Interno e Confidencial - Proibida Reprodução",
+        "primary_color": "#d9534f"
+    },
+    "components": [
+        {
+            "id": "corpo_principal",
+            "type": "template",
+            "source": "storage/components/specifications.md",
+            "file_format": "md"
+        },
+        {
+            "id": "anexo_elevadores",
+            "type": "template",
+            "source": "storage/components/elevators.md",
+            "file_format": "md",
+            "condition": "incluir_elevador == 'Sim'"
+        }
+    ]
+}
