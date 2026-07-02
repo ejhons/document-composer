@@ -1,0 +1,29 @@
+{
+    "recipe_name": "Relatório de Engenharia Estrutural",
+    "version": "1.4.2",
+    "target_format": "pdf",
+    "style": {
+        "reference_docx": "engine/src/doc_engine/storage/styles/reference.docx",
+        "include_header": true,
+        "include_footer": true,
+        "header_text_left": "M&A Engenharia Associados",
+        "header_text_right": "Cálculo de Infraestrutura",
+        "footer_text_left": "Uso Interno e Confidencial - Proibida Reprodução",
+        "primary_color": "#d9534f"
+    },
+    "components": [
+        {
+            "id": "corpo_tecnico",
+            "type": "template",
+            "source": "engine/src/doc_engine/storage/components/specifications.md",
+            "file_format": "md"
+        },
+        {
+            "id": "imagem simples",
+            "type": "external",
+            "source": "engine/src/doc_engine/storage/components/fluxograma.png",
+            "file_format": "image",
+            "condition": "discipline == 'terraplenagem'"
+        }
+    ]
+}

@@ -1,7 +1,7 @@
 import logging
 from rich.logging import RichHandler
 from traceback import print_exc
-from engine.src.doc_engine.core.pipeline import DocumentPipeline
+from engine.src.doc_engine.execution.pipeline import DocumentPipeline
 
 def configure_structured_logging():
     """Initializes standard application stream loggers with consistent formats."""
@@ -23,7 +23,10 @@ def run_mvp_cli_application():
     
     try:
         # Initialize the decoupled high-level Pipeline abstraction abstraction layer
-        pipeline = DocumentPipeline(manifest_path=manifest_target, output_root=root_path + "output")
+        pipeline = DocumentPipeline(
+            manifest_path=manifest_target, 
+            output_root=root_path + "output"
+            )
         
         # Step 1: Handle system environment setup
         if not pipeline.setup_environment():

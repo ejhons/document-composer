@@ -1,0 +1,150 @@
+Listagem de caminhos de pasta para o volume Acer
+O n|mero de s|rie do volume | 00000055 7EA8:66DB
+C:.
+|   .gitignore
+|   LICENSE
+|   main.py
+|   pandoc-3.10-windows-x86_64.msi
+|   pyproject.toml
+|   README.md
+|   requirements.txt
+|   tree.txt
+|   
++---engine
+    +---docs
+    |   +---architeture
+    |       |   architeture.md
+    |       |   definitions.md
+    |       |   overview.md
+    |       |   pipeline.md
+    |       |   registries.md
+    |       |   
+    |       +---adr
+    |               adr-001-execution_order.md
+    |               
+    +---src
+    |   +---doc_engine
+    |       |   exceptions.py
+    |       |   output_temp_header.html
+    |       |
+    |       |   
+    |       +---adapters
+    |       |       adapters.py
+    |       |       docx_adapter.py
+    |       |       excel_adapter.py
+    |       |       image_adapter.py
+    |       |       md_adapter.py
+    |       |       pdf_adapter.py
+    |       |       
+    |       |       
+    |       +---compilers
+    |       |       compilers.py
+    |       |       docx_compiler.py
+    |       |       html_compiler.py
+    |       |       pdf_compiler.py
+    |       |       
+    |       |       
+    |       +---core
+    |       |   |   cache.py
+    |       |   |   compiler.py
+    |       |   |   compilers copy.py
+    |       |   |   engine.py
+    |       |   |   parser.py
+    |       |   |   sanitizers.py
+    |       |   |
+    |       |   |   
+    |       |           
+    |       +---domain
+    |       |   +---handlers
+    |       |   |       base.py
+    |       |   |       directive_registry.py
+    |       |   |       include_directive.py
+    |       |   |       
+    |       |   +---inspectors
+    |       |   |       registry.py
+    |       |   |       
+    |       |   +---manifests
+    |       |   |       manifest_loader.py
+    |       |   |       
+    |       |   +---recipe
+    |       |           dependency_resolver.py
+    |       |           recipe_graph.py
+    |       |           recipe_graph_builder.py
+    |       |           
+    |       +---models
+    |       |   |   inspector_result.py
+    |       |   |   models.py
+    |       |   |   runtime.py
+    |       |   |   topology.py
+    |       |   |   
+    |       |   +---__pycache__
+    |       |           models.cpython-314.pyc
+    |       |           runtime.cpython-314.pyc
+    |       |           
+    |       +---output
+    |       |   |   cache_registry.json
+    |       |   |   document_distribution.md
+    |       |   |   document_manifest_delivery.json
+    |       |   |   final_report.docx
+    |       |   |   final_report.html
+    |       |   |   final_report.pdf
+    |       |   |   
+    |       |   +---resources
+    |       |           min_page_1.png
+    |       |           rendered_diagram_1.png
+    |       |           
+    |       +---runtime
+    |       |       component_node.py
+    |       |       inspector.py
+    |       |       pipeline.py
+    |       |       scheduler.py
+    |       |       
+    |       +---storage
+    |       |   |
+    |       |   |   
+    |       |   +---components
+    |       |   |       cover.md
+    |       |   |       dados_cdr.xlsx
+    |       |   |       diagramas_cubacao.md
+    |       |   |       elevators.md
+    |       |   |       fluxograma.png
+    |       |   |       localizacao.md
+    |       |   |       min.pdf
+    |       |   |       quadros_cub.docx
+    |       |   |       specifications.md
+    |       |   |       test.md
+    |       |   |       
+    |       |   |       
+    |       |   +---recipes
+    |       |   |       engineering_manifest - Copia.json
+    |       |   |       engineering_manifest.json
+    |       |   |       engineering_manifest_.json
+    |       |   |       engineering_manifest_html.json
+    |       |   |       engineering_manifest_sanitizer.json
+    |       |   |       
+    |       |   |       
+    |       |   +---styles
+    |       |           reference.docx
+    |       |           referencia.docx
+    |       |           
+    |       |           
+    |       +---utils
+    |       |   |
+    |       |   |   
+    |       |   +---logging
+    |       |       |   config.py
+    |       |       |   logger.py
+    |       |       |
+    |       |       
+    |               
+    +---tests
+        |   conftest.py
+        |
+        |   
+        +---unit
+        |   |   test_field_definition.py
+        |   |   test_parser.py
+        |   |   _pipeline.py
+        |   |
+        |   |   
+                
