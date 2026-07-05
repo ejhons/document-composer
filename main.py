@@ -1,7 +1,7 @@
 import logging
 from rich.logging import RichHandler
 from traceback import print_exc
-from engine.src.doc_engine.execution.pipeline import DocumentPipeline
+from engine.runtime.pipeline import DocumentPipeline
 
 def configure_structured_logging():
     """Initializes standard application stream loggers with consistent formats."""

@@ -1,0 +1,48 @@
+from typing import Literal
+from pydantic import BaseModel, Field
+from engine.frontend.syntax.directives import DirectiveCall
+from engine.frontend.syntax.fields import FieldDefinition
+from engine.frontend.syntax.variables import VariableReference
+
+class InspectionResult(BaseModel):
+    body: str | None = None
+    fields: dict[str, FieldDefinition] = Field(default_factory=dict)
+    variables: list["VariableReference"] = Field(default_factory=list) # type: ignore
+    directives: list["DirectiveCall"] = Field(default_factory=list) # type: ignore
+    diagnostics: list[Diagnostic] = Field(default_factory=list)
+    metadata:dict[str, str] = Field(default_factory=dict)
+    
+    @property
+    def unique_variables(self) -> dict[str, VariableReference]:
+        return {
+            ref.name: ref
+            for ref in self.variables
+        }
+    
+    @property
+    def variable_names(self) -> set[str]:
+        return set([
+            ref.name
+            for ref in self.variables
+            ])
+
+class Diagnostic(BaseModel):
+    severity: Literal[
+        "warning",
+        "error"
+    ]
+    message: str
+    line: int
+
+
+# class InspectElement(BaseModel):    
+#     id: str
+#     source_path: str
+#     file_format: str
+#     cache: str = None
+#     inspect_elements:List[InspectElement] = Field(default_factory=list)
+
+#     @property
+#     def has_cache(self):
+#         return self.cache is not None
+    
