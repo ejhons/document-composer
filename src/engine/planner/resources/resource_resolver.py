@@ -5,12 +5,17 @@ from engine.planner.resources.base import ResourceResolver
 
 
 class LocalResourceResolver(ResourceResolver):
+    '''
+    Capaz de normalizar o endereço de componentes.
+    '''
     def normalize(
             self,
             current: ComponentConfig,
             source: str
         ) -> str:
-        
+        '''
+        Normaliza o endereço para um endereço global.
+        '''        
         source = (
             Path(current.source)
             .parent

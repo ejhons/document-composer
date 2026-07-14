@@ -6,10 +6,13 @@ class VisitState(Enum):
     VISITED = 2
 
 class GraphValidator():
+    '''
+    Validate a graph detecting cycles.
+    '''
     def detect_cycles(self) -> bool:
         """
         Detecta ciclos no grafo de dependências.
-
+        ---
         Returns:
             True caso exista algum ciclo.
         """

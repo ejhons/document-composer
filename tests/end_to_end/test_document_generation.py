@@ -1,83 +1,13 @@
 import pytest
 
+from engine.backend.ir.builder import DocumentIRBuilder
 from engine.frontend.inspection_pipeline import InspectionPipeline
 from engine.planner.recipe_builder import RecipeGraphBuilder
 from engine.runtime.execution.context import ExecutionContext
 from engine.runtime.engine import Engine
+from engine.runtime.execution.session import ExecutionSession
 
-
-# def test_engine_resolves_runtime_and_dependencies(engine):
-#     graph = engine.plan(
-#         component=NodeComponent.from_file("tests/resources/main.md"),
-#         inputs={
-#             "name": "Everton",
-#             "type": "person"
-#         }
-#     )
-
-#     assert len(graph.nodes) == 2
-
-#     main = graph.root
-#     dependency = graph.find_by_path(
-#         "contracts/person.md"
-#     )
-
-#     assert dependency is not None
-
-#     assert main.resolution.content == (
-#         "Olá Everton\n\n"
-#         '@include("contracts/person.md")'
-#     )
-
-#     assert not main.resolution.pending_inputs
-#     assert not main.resolution.pending_dependencies
-
-#     assert main.resolution.resolved
-
-#     assert dependency.resolution.resolved
-
-# def test_engine_keeps_unresolved_directive(engine):
-#     graph = engine.plan(
-#         component=Component.from_file("tests/resources/main.md"),
-#         inputs={
-#             "name": "Everton"
-#         }
-#     )
-
-#     root = graph.root
-
-#     assert root.resolution.content == (
-#         "Olá Everton\n\n"
-#         '@include("contracts/{{ type }}.md")'
-#     )
-
-#     assert root.resolution.pending_inputs == {
-#         "type"
-#     }
-
-#     assert len(graph.nodes) == 1
-
-# def test_engine_converges_after_new_input(engine):
-#     graph = engine.plan(
-#         component=Component.from_file("tests/resources/main.md"),
-#         inputs={
-#             "name": "Everton"
-#         }
-#     )
-
-#     graph = engine.resolve(
-#         graph,
-#         {
-#             "name": "Everton",
-#             "type": "person"
-#         }
-#     )
-
-#     assert len(graph.nodes) == 2
-
-#     assert graph.root.resolution.resolved
-
-def test_engine_converges_until_no_changes(
+def test_end_to_end(
     full_engine,
     temp_workspace,
     markdown_file,
@@ -128,7 +58,6 @@ graph TD
     C -- Sim --> D[Fundação Direta]
     C -- Não --> E[Estacas Profundas]
 ```
-
 @include("annex.md")
 """
     )
@@ -158,38 +87,36 @@ graph TD
 
     execution_context = ExecutionContext(
         inputs= {
+            'cliente': 'Cliente 123',
+            'client': 'Cliente 1234',
+            'classe': 'main',
             'logo':'generic',
             'project_title': 'Generic project',
             'localization': 'HERE',
             'flow': 35.0,
         }
     )
-    # graph = RecipeGraphBuilder(context=context).build(
-    #     recipe_manifest
-    # )
 
-    # inspector_pipeline = InspectionPipeline()
-    # inspector_pipeline.execute(
-    #     graph=graph,
-    #     planning_context=full_engine.plan_context
-    # )
-
-    session = full_engine.create_session(
+    session: ExecutionSession = full_engine.create_session(
         manifest=recipe_manifest,
         context=execution_context
     )
+
     full_engine.build_graph(
         session
     )
+    
     full_engine.resolve(
         session
     )
 
-    full_engine.plan(
+
+    execution_plan = full_engine.plan(
         session,
         scheduler
     )
-    #     graph,
-    #     execution_context
-    # )
-    assert session.graph
+
+    
+    document = DocumentIRBuilder().build(session.graph)
+
+    assert document is not None

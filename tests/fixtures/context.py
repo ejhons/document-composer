@@ -8,7 +8,7 @@ from engine.planner.resources.resource_resolver import LocalResourceResolver
 
 
 @pytest.fixture
-def context():
+def planning_context():
     resource_resolver=LocalResourceResolver()
     directive_registry=DirectiveRegistry()
     inspector_registry=StaticInspectorRegistry()

@@ -3,5 +3,11 @@
         "."
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "workbench.colorCustomizations": {
+        // "editor.background": "#1e1e1e",
+        // "activityBar.background": "#000000",
+        // "terminal.foreground": "#ed0000",
+        "titleBar.activeBackground": "#780202"
+    }
 }

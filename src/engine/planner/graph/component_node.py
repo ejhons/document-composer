@@ -1,8 +1,9 @@
 from pydantic import BaseModel, Field
+from engine.common.models.assets import ComponentContent
 from engine.common.models.inspection import InspectionResult
 from engine.common.models.recipe import ComponentConfig
 from engine.common.utils.generator import IdGenerator
-from engine.planner.graph.resolution_state import ResolutionState
+from engine.planner.resolution.resolution_state import ResolutionState
 
 
 class ComponentNode(BaseModel):
@@ -11,8 +12,11 @@ class ComponentNode(BaseModel):
     '''
     component: ComponentConfig
     id: str = Field(default_factory = IdGenerator.generate)
-    inspection: InspectionResult | None = InspectionResult()
-    resolution: ResolutionState | None = ResolutionState()
+    # Result of inspection operation keeping diagnostics, variables, directives and etc.
+    inspection: InspectionResult | None = None
+    resolution: ResolutionState = ResolutionState()
+    adapted: ComponentContent | None = None
+    # After resolution, some artifacts as dependencies, revision and pending inputs and dependencies are defined.
     # resolved: bool = False
     # resolved_content: str | None = None
 
@@ -20,6 +24,7 @@ class Dependency(BaseModel):
     source_id: str
     target_id: str
     kind: str
+    origin: str | None = None
 
 
 

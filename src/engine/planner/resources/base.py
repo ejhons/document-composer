@@ -3,6 +3,9 @@ from engine.common.models.recipe import ComponentConfig
 
 
 class ResourceResolver(ABC):
+    '''
+    ResourceResolve solves resources (files, links, etc)
+    '''
     @abstractmethod
     def normalize(self, source: str) -> str:
         ...

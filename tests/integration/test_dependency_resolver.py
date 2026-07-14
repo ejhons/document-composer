@@ -3,9 +3,9 @@ from pprint import pprint
 from engine.frontend.directives.implementations.include_directive import IncludeDirectiveHandler
 from engine.frontend.inspection_pipeline import InspectionPipeline
 from engine.frontend.inspectors.implementations.inspector import MarkdownInspector
-from engine.planner.graph.resolution_state import ResolutionState
+from engine.planner.resolution.resolution_state import ResolutionState
 from engine.planner.recipe_builder import RecipeGraphBuilder
-from engine.planner.graph.dependency_resolver import DependencyResolver
+from engine.planner.resolution.dependency_resolver import DependencyResolver
 
 
 
@@ -13,7 +13,7 @@ def test_markdown_pipeline_enriches_recipe_graph(
     temp_workspace,
     markdown_file,
     recipe_manifest,
-    context
+    planning_context
 ):
     """
     Pipeline completo:
@@ -75,13 +75,13 @@ fields:
         )
     )
 
-    graph = RecipeGraphBuilder(context=context).build(
+    graph = RecipeGraphBuilder(context=planning_context).build(
         recipe_manifest
     )
 
     # inspectors = StaticInspectorRegistry()
 
-    context.inspector_registry.register(
+    planning_context.inspector_registry.register(
         "md",
         MarkdownInspector()
     )
@@ -89,14 +89,14 @@ fields:
     # directives = DirectiveRegistry()
     # directives
 
-    context.directive_registry.register(
+    planning_context.directive_registry.register(
         IncludeDirectiveHandler()
     )
 
     inspector_pipeline = InspectionPipeline()
     inspector_pipeline.execute(
         graph=graph,
-        planning_context=context
+        planning_context=planning_context
     )
 
     resolver = DependencyResolver()
@@ -108,17 +108,18 @@ fields:
     for node in graph.nodes.values():
         node.resolution = ResolutionState()
 
-    graph2 = resolver.resolve(
+    # graph2 = 
+    resolver.resolve(
         graph=graph,
-        context=context
+        context=planning_context
         )
 
     #
     # Verificações
     #
-    pprint(graph2.model_dump())
+    # pprint(graph.model_dump())
 
-    assert len(graph2.nodes) == 3
+    assert len(graph.nodes) == 3
 
     assert graph.find_by_source(
         (temp_workspace / "annex.md").as_posix()
@@ -132,8 +133,8 @@ fields:
         (temp_workspace / "annex.md").as_posix()
     )
 
-    print(memorial.inspection.body)
-    print(memorial.resolution.content)
+    # print(memorial.inspection.body)
+    # print(memorial.resolution.content)
 
     assert graph.has_dependency(
         memorial.id,

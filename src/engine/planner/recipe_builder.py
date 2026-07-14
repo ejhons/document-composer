@@ -5,6 +5,9 @@ from engine.planner.graph.component_node import ComponentNode
 
 
 class RecipeGraphBuilder():
+    '''
+    Build a graph from REcipe Manifest by Planning Context Definition.
+    '''
     def __init__(self, context: PlanningContext):
         self.context = context
 

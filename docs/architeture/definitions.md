@@ -1,11 +1,13 @@
-**Adapter**: Tranform custom object as word, pdf, excel in markdown. Also is responsable for evaluate fields, images and mermaid graph for filling final distribution_markdown.md
-**Compiler**: Transform distribution_markdown.md to a specified format. In this moment all references are join together in a single file.
+**Adapter**: Tranforms ComponentNode what rpresents a custom object as word, pdf, excel content to a markdown language.  Also is responsable creating respective assets neccessary for that representation.
+**Compiler**: Transform FragmentedMarkdown/DocumentIR to a specified format. In this moment all references are join together in a single file.
 
-**Variável**: marcada com {{...}} nos arquivos markdown. Revelam campos dinâmicos que necessitarão da resolução pelo usuário. Resolvidos pela *Engine.*
+**Input**: marked with {{...}} in the Markdown files. They reveal dynamic fields that require resolution by the user. Resolved by the *Engine*.]
 
-**Diretiva**: Funcionam como funções no markdown. Identificadas por @nome_funcao(\*\*params) onde \*\*params marca o conjunto de parâmetros nomeados. Argumentos de uma diretiva pode ainda receber valores de variáveis, tornando-as diretivas dinâmicas. São resolvidas em tempo de execução com a resolução do usuário. São resolvidas pelo *Parser* quando estáticas. Se dinâmicas, são resolvidas pela *Engine*. Ver classe `IncludeDirective`
+**InputDefinition:** define property of inputs as type, description and any other metadata relevant for backend and frontend.
 
-Os argumentos são: string, número, booleano e expressão Jinja
+**Diretiva**: They operate like functions within Markdown. They are identified by `@function_name(**params)`, where `**params` denotes the set of named parameters. Directive arguments can also accept inpur values, making them dynamic directives. They are resolved at runtime based on user Execution Context. Static directives are resolved by the *DependencyResolver*, while dynamic ones are first treated for *RuntimeResolver.* If succesfull, *DependencyResolver* acts as expected in firective. See the `IncludeDirective` class.
+
+Os inputs são: string, número, booleano e expressão Jinja
 
 Mais nada.
 
@@ -15,8 +17,6 @@ Exemplos válidos:
 `@include("imagem.png", optional=True)`
 `@include("imagem_{{ indice }}.png")`
 `@include(condition="{{ tem_imagem }}")`
-
-
 
 # Qual a responsabilidade do Scheduler?
 

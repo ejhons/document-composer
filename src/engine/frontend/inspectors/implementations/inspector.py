@@ -15,14 +15,16 @@ class MarkdownInspector(BaseOjbjectInspector):
         '''
         task.format_type = md
         '''
-        parsed = self.markdown_parser.parse_file(component.source)
+        parsed = self.markdown_parser.parse_file(
+            component.source
+        )
+        self.parsed_markdown = parsed
 
         result = InspectionResult(
             body = parsed.body,
             variables=parsed.variables,
             directives=parsed.directives,
             fields=parsed.fields,
-            #diagnostics
             metadata=parsed.metadata
         )
 

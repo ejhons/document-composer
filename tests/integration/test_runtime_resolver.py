@@ -3,17 +3,17 @@ from pprint import pprint
 from engine.frontend.directives.implementations.include_directive import IncludeDirectiveHandler
 from engine.frontend.inspection_pipeline import InspectionPipeline
 from engine.frontend.inspectors.implementations.inspector import MarkdownInspector
-from engine.planner.graph.resolution_state import ResolutionState
-from engine.planner.graph.runtime_resolver import RuntimeResolver
+from engine.planner.resolution.resolution_state import ResolutionState
+from engine.planner.resolution.runtime_resolver import RuntimeResolver
 from engine.planner.recipe_builder import RecipeGraphBuilder
-from engine.runtime.context import ExecutionContext
+from engine.runtime.execution.context import ExecutionContext
 
 
 def test_capturing_variables_in_markdown(
     temp_workspace,
     recipe_manifest,
     markdown_file,
-    context
+    planning_context
 ):
     # Cria um arquivo markdown em uma pasta temporária
     markdown_file(
@@ -54,15 +54,15 @@ graph TD
         temp_workspace / "test_resolver.md"
     ).as_posix()
     
-    graph = RecipeGraphBuilder(context=context).build(
+    graph = RecipeGraphBuilder(context=planning_context).build(
         recipe_manifest
     )
     
-    context.inspector_registry.register(
+    planning_context.inspector_registry.register(
         "md",
         MarkdownInspector()
     )
-    context.directive_registry.register(
+    planning_context.directive_registry.register(
         IncludeDirectiveHandler()
     )
     execution_context = ExecutionContext(
@@ -75,7 +75,7 @@ graph TD
     inspector_pipeline = InspectionPipeline()
     inspector_pipeline.execute(
         graph=graph,
-        planning_context=context
+        planning_context=planning_context
     )
 
     resolver = RuntimeResolver()
@@ -86,8 +86,8 @@ graph TD
         list(graph.nodes.values())[0],
         context=execution_context
     )
-    pprint(graph.model_dump())
-    print(list(graph.nodes.values())[0].inspection.body)
-    print(list(graph.nodes.values())[0].resolution.content)
+    # pprint(graph.model_dump())
+    # print(list(graph.nodes.values())[0].inspection.body)
+    # print(list(graph.nodes.values())[0].resolution.content)
 
     # assert False

@@ -1,13 +1,20 @@
 from typing import Iterator
 from collections import deque
 from engine.planner.graph.component_node import ComponentNode
+from engine.planner.graph.graph import RecipeGraph
 
 
 class Topology():
-    def executable_nodes(self) ->  Iterator[ComponentNode]:
-        return iter(self.topological_order())
+    def executable_nodes(
+        self,
+        graph:RecipeGraph
+    ) ->  Iterator[ComponentNode]:
+        return iter(self.topological_order(graph))
     
-    def topological_order(self) -> list[ComponentNode]:
+    def topological_order(
+        self,
+        graph:RecipeGraph
+    ) -> list[ComponentNode]:
         """
         Retorna os nós em ordem topológica.
         Utiliza o método de Kahn para ordenação do grafo.
@@ -16,15 +23,15 @@ class Topology():
         """
         indegree = {
             node_id: 0
-            for node_id in self.nodes
+            for node_id in graph.nodes
         }
 
         adjacency = {
             node_id: []
-            for node_id in self.nodes
+            for node_id in graph.nodes
         }
 
-        for edge in self.edges:
+        for edge in graph.edges:
             adjacency[edge.target_id].append(edge.source_id)
             indegree[edge.source_id] += 1
 
@@ -38,13 +45,13 @@ class Topology():
 
         while queue:
             node_id = queue.popleft()
-            result.append(self.nodes[node_id])
+            result.append(graph.nodes[node_id])
             for dependent in adjacency[node_id]:
                 indegree[dependent] -= 1
                 if indegree[dependent] == 0:
                     queue.append(dependent)
 
-        if len(result) != len(self.nodes):
+        if len(result) != len(graph.nodes):
             raise ValueError(
                 "Cyclic occurence in graph"
             )

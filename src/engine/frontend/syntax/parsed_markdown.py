@@ -1,4 +1,5 @@
 
+from dataclasses import Field
 from typing import Any
 
 from pydantic import BaseModel
@@ -9,11 +10,22 @@ from engine.frontend.syntax.variables import VariableReference
 
 
 class ParsedMarkdown(BaseModel):
-    metadata: dict[str, Any]          # sem a chave "fields"
-    fields: dict[str, FieldDefinition]
-    variables: list[VariableReference]
-    directives: list[DirectiveCall]
     body: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    fields: dict[str, FieldDefinition] = Field(default_factory=dict)
+    variables: list[VariableReference] = Field(default_factory=list)
+    _directives_map: dict[int, DirectiveCall] = Field(default_factory=dict)
+
+    def find_directive_by_id(self, id:int):
+        return self._directives_map.get(id, None)
+
+    @property
+    def directives(self) -> list[DirectiveCall]:
+        return list(self._directives_map.values())
+    
+    @directives.setter
+    def directives(self, value: DirectiveCall):
+        self._directives_map[value.index] = value
 
     @property
     def unique_variables(self) -> dict[str, VariableReference]:

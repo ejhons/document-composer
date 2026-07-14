@@ -1,11 +1,19 @@
 from pydantic import BaseModel, Field
 
 class DirectiveCall(BaseModel):
+    index: int
     name: str
     raw: str
+    # line: int
+    # column: int
+    start: TextSpan
+    end: TextSpan
+    arguments: list[DirectiveArgument] = Field(default_factory=list)
+
+class TextSpan(BaseModel):
     line: int
     column: int
-    arguments: list[DirectiveArgument] = Field(default_factory=list)
+    index: int
 
 class DirectiveArgument(BaseModel):
     name: str | None

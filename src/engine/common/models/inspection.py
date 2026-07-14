@@ -11,6 +11,9 @@ class InspectionResult(BaseModel):
     directives: list["DirectiveCall"] = Field(default_factory=list) # type: ignore
     diagnostics: list[Diagnostic] = Field(default_factory=list)
     metadata:dict[str, str] = Field(default_factory=dict)
+
+    def __bool__(self):
+        return self.body is not None
     
     @property
     def unique_variables(self) -> dict[str, VariableReference]:

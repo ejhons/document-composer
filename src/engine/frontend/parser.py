@@ -3,7 +3,7 @@ import re
 import yaml
 from typing import Any, Dict, Tuple
 
-from engine.frontend.syntax.directives import DirectiveArgument, DirectiveCall, Expression
+from engine.frontend.syntax.directives import DirectiveArgument, DirectiveCall, Expression, TextSpan
 from engine.frontend.syntax.expressions.parser import ExpressionParser
 from engine.frontend.syntax.fields import FieldDefinition
 from engine.frontend.syntax.parsed_markdown import ParsedMarkdown
@@ -113,7 +113,7 @@ class MarkdownParser:
         variables: list[VariableReference] = []
         pattern = re.compile(r"(\{\{\s*(.*?)\s*\}\})")
 
-        for match in pattern.finditer(content):
+        for idx, match in enumerate(pattern.finditer(content)):
             raw = match.group(1)          # "{{ area | round(2) }}"
             expression = match.group(2)   # "area | round(2)"
 
@@ -121,8 +121,9 @@ class MarkdownParser:
                 VariableReference(
                     name=expression,
                     raw=raw,
-                    start=match.start(),
-                    end=match.end(),
+                    index=idx
+                    # start=match.start(),
+                    # end=match.end(),
                 )
             )
 
@@ -133,7 +134,7 @@ class MarkdownParser:
     
     def extract_directives(self, content: str) -> list[DirectiveCall]:
         directives: list[DirectiveCall] = []
-        for match in DIRECTIVE_START.finditer(content):
+        for idx, match in enumerate(DIRECTIVE_START.finditer(content)):
             name = match.group(1)
             start = match.start()
             open_paren = content.find("(", match.end() - 1)
@@ -149,20 +150,67 @@ class MarkdownParser:
             raw = content[start:end + 1]
             arguments_text = content[open_paren + 1:end]
 
-            line = content.count("\n", 0, start) + 1
-            column = start - content.rfind("\n", 0, start)
+            line_start = content.count("\n", 0, start) + 1
+            column_start = start - content.rfind("\n", 0, start)
+            line_end = content.count("\n", 0, end) + 1
+            column_end = end - content.rfind("\n", 0, end)
+
             directives.append(
                 DirectiveCall(
+                    index=idx,
                     name=name,
                     raw=raw,
                     arguments=self.extract_directive_parameters(
                         arguments_text
                     ),
-                    line=line,
-                    column=column
+                    start=TextSpan(
+                        line=line_start, 
+                        column=column_start, 
+                        index=start
+                    ),
+                    end=TextSpan(
+                        line=line_end,
+                        column=column_end,
+                        index=end
+                    )
+                    # line=line,
+                    # column=column
                 )
             )
-        return directives
+        return directives  
+    # def extract_directives(self, content: str) -> list[DirectiveCall]:
+    #     directives: list[DirectiveCall] = []
+    #     for idx, match in enumerate(DIRECTIVE_START.finditer(content)):
+    #         name = match.group(1)
+    #         start = match.start()
+    #         open_paren = content.find("(", match.end() - 1)
+    #         end = self._find_matching_parenthesis(
+    #             content,
+    #             open_paren
+    #         )
+
+    #         if end == -1:
+    #             # posteriormente pode gerar um Diagnostic
+    #             continue
+
+    #         raw = content[start:end + 1]
+    #         arguments_text = content[open_paren + 1:end]
+
+    #         line = content.count("\n", 0, start) + 1
+    #         column = start - content.rfind("\n", 0, start)
+    #         directives.append(
+    #             DirectiveCall(
+    #                 index=idx,
+    #                 name=name,
+    #                 raw=raw,
+    #                 arguments=self.extract_directive_parameters(
+    #                     arguments_text
+    #                 ),
+    #                 line=line,
+    #                 column=column
+    #             )
+    #         )
+    #     return directives
     
     
     

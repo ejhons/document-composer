@@ -1,12 +1,14 @@
 import json
 import os
 import logging
+from warnings import deprecated
 
 from engine.common.models.recipe import RecipeManifest
 
 # Configuração do Logger local do módulo
 logger = logging.getLogger("doc_engine.pipeline")
 
+@deprecated(message='not implemented yet.')
 class ManifestLoader:
     """
     Orchestrates the lifecycle of document discovery, setup, assembly, 

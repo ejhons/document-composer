@@ -1,11 +1,17 @@
-import os
 import re
 import base64
 import logging
 import requests
-from typing import Any, Dict
+
+from typing import Any
+from pathlib import Path
 from engine.frontend.parser import MarkdownParser
+from engine.common.models.workspace import Workspace
+from engine.common.exceptions import DownloadException
 from engine.backend.adapters.base import BaseContentAdapter
+from engine.planner.planning_context import PlanningContext
+from engine.planner.graph.component_node import ComponentNode
+from engine.common.models.assets import Asset, AssetBundle, ComponentContent
 
 logger = logging.getLogger("doc_engine.adapters")
 
@@ -16,148 +22,325 @@ class MarkdownAdapter(BaseContentAdapter):
     """
     def __init__(
             self,
-            jinja_env: Any,
+            parser: MarkdownParser,
             cache_manager: Any,
-            mermaid_adapter: MermaidMarkdownAdapter | None = None,
-            field_adapter : MarkdownFieldTemplateAdapter | None = None
+            mermaid_adapter: MermaidMarkdownAdapter | None = None
             ):
-        self.jinja_env = jinja_env
+        self.parser = parser
         self.cache = cache_manager
-        self.mermaid_adapter = mermaid_adapter or MermaidMarkdownAdapter(cache_manager=self.cache)
-        self.field_adapter = field_adapter or MarkdownFieldTemplateAdapter(jinja_env=jinja_env)
+        self.mermaid_adapter = mermaid_adapter or MermaidMarkdownAdapter(cache_manager=self.cache, parser=parser)
 
-    def convert(self, source_path: str, output_dir: str, **kwargs) -> str:
-        field_generated_markdown = self.field_adapter.convert(
-            source_path,
-            output_dir,
+    def convert(
+        self, 
+        node: ComponentNode,
+        context: PlanningContext,
+        workspace: Workspace,
+        # source_path: str,
+        # output_dir: str,
+        **kwargs
+    ) -> ComponentContent:   
+        # markdown = kwargs.get("raw_markdown")
+        markdown = node.resolution.content
+        # if markdown is None:
+        #     with open(source_path, encoding="utf8") as fp:
+        #         markdown = fp.read()
+
+        result = self.mermaid_adapter.convert(
+            node,
+            context,
+            workspace=workspace,
             **kwargs
-        )        
-        processed_markdown = self.mermaid_adapter.convert(
-            source_path,
-            source_path,
-            output_dir, 
-            raw_markdown=field_generated_markdown,
-              **kwargs
         )
+        parsed = result.markdown
 
-        return processed_markdown
-
-    
+        return ComponentContent(
+            markdown=parsed,
+            assets=result.assets,
+        )
 
 class MermaidMarkdownAdapter(BaseContentAdapter):
     """
     Handles rendering of Markdown components, compiling Jinja variables, 
     and resolving embedded dynamic sub-blocks like inline Mermaid diagrams.
     """
-    def __init__(self, cache_manager: Any):
+    def __init__(
+        self,
+        parser: MarkdownParser,
+        cache_manager: Any
+    ):
+        self.parser = parser
         self.cache = cache_manager
 
-    def convert(self, source_path: str, output_dir: str, **kwargs) -> str:
-        raw_markdown = kwargs.get('raw_markdown')
-        output_dir = kwargs.get('raw_markdown', output_dir)
+    def convert(
+        self, 
+        node: ComponentNode,
+        context: PlanningContext,
+        workspace: Workspace
+        # self,
+        # source_path: str,
+        # output_dir: str,
+        # **kwargs
+    ) -> ComponentContent:
         
-        if (raw_markdown is None) and (not os.path.exists(source_path)):
-            logger.warning(f"Mermaid file source missing at: {source_path}")
-            return ""
-            # raise FileNotFoundError(f"External Markdown file missing: {source_path}")
-        
-        if raw_markdown is None:
-            with open(source_path, 'r', encoding='utf-8') as file:
-                raw_markdown = f"\n\n{file.read()}\n\n"
-        
-        return self._convert_inline_mermaid(raw_markdown, output_dir)
+        markdown = node.resolution.content
+        # markdown = kwargs.get("raw_markdown")
+        # if markdown is None:
+        #     markdown = self.parser.read_markdown(source_path)
 
-        
-    def _convert_inline_mermaid(self, raw_markdown: str, output_resource_dir: str) -> str:
+        assets = AssetBundle()
+        processed = markdown
+
+        #Localiza blocos mermaid dentro do Markdown
+        matches = self._find_blocks(markdown)
+        for block in matches:
+            # Cria o asset do da imagem gerada pela renderização.
+            asset = self._render(
+                diagram_code=block, 
+                output_dir=workspace.images_dir
+            )
+            # Parte para próxima iteração caso não seja criada uma imagem
+            if asset is None:
+                continue
+            # Adiciona os assets gerados ao bundle
+            assets.add(asset)
+            processed = processed.replace(
+                block.full_text,
+                f'![Diagram]({asset.output.as_posix()})'
+            )
+
+        return ComponentContent(
+            markdown=processed,
+            assets=assets
+        )
+
+
+    def _find_blocks(
+        self,
+        raw_markdown: str
+    ) -> list[Any]:
         """Scans rendered text for inline mermaid code blocks and translates them into static images."""
         mermaid_pattern = r'```mermaid\s*\n(.*?)\n```'
-        matches = re.findall(mermaid_pattern, raw_markdown, re.DOTALL)
-        if not matches:
-            return raw_markdown
+        matches = re.findall(
+            mermaid_pattern,
+            raw_markdown,
+            re.DOTALL
+        )
+        return matches
+        
 
-        processed_markdown = raw_markdown
-        os.makedirs(output_resource_dir, exist_ok=True)
+    def _render(
+        self,
+        diagram_code: str,
+        # source: Path,
+        output_dir: Path
+    ) -> Asset | None:
+        # Cria uma assinatura única baseada no próprio código do diagrama
+        diagram_hash = self.cache.calculate_text_hash(diagram_code)
+        diagram_id = f"inline_diagram_{diagram_hash[:10]}"
+        
+        image_filename = f"rendered_{diagram_id}.png"
+        output_image_path = output_dir.joinpath(image_filename)
+        # output_image = os.path.join(output_dir, image_filename)
+        # output_image_path = Path(output_image)
+        
+        asset = Asset(
+            id = diagram_id,
+            type = 'image',
+            source= output_image_path,#source or output_image_path,
+            output= output_image_path,
+        )
 
-        for _, diagram_code in enumerate(matches):
-            # Cria uma assinatura única baseada no próprio código do diagrama
-            diagram_hash = self.cache.calculate_text_hash(diagram_code)
-            diagram_id = f"inline_diagram_{diagram_hash[:10]}"
-            
-            image_filename = f"rendered_{diagram_id}.png"
-            output_image_path = os.path.join(output_resource_dir, image_filename)
-            
-            # Verificação de cache nativa
-            if self.cache.is_cached(diagram_id, diagram_hash, [output_image_path]):
-                logger.info(f"Cache hit for inline diagram '{diagram_id}'. Reusing PNG asset.")
-                image_markdown_tag = f"\n\n![System Diagram]({output_image_path})\n\n"
-            else:
-                logger.info(f"Cache miss for inline diagram '{diagram_id}'. Fetching cloud render...")
-                try:
-                    graph_bytes = diagram_code.encode('utf-8')
-                    base64_bytes = base64.b64encode(graph_bytes)
-                    base64_string = base64_bytes.decode('utf-8')
+        # Verificação de cache nativa
+        if self.cache.is_cached(diagram_id, diagram_hash, [output_image_path]):
+            logger.info(f"Cache hit for inline diagram '{diagram_id}'. Reusing PNG asset.")
+        else:
+            logger.info(f"Cache miss for inline diagram '{diagram_id}'. Fetching cloud render...")
+            try:
+                graph_bytes = diagram_code.encode('utf-8')
+                base64_bytes = base64.b64encode(graph_bytes)
+                base64_string = base64_bytes.decode('utf-8')
+                
+                url = f"[https://mermaid.ink/img/](https://mermaid.ink/img/){base64_string}"
+                response = requests.get(url, timeout=15)
+                
+                if response.status_code == 200:
+                    with open(output_image_path, 'wb') as f:
+                        f.write(response.content)
+                    self.cache.update_cache(diagram_id, diagram_hash, [output_image_path])
+                else:
+                    raise DownloadException("Couldn't using mermaid.ink API")
+            except Exception as e:
+                logger.error(f"Failed to render inline mermaid block: {e}")
+                return None
                     
-                    url = f"[https://mermaid.ink/img/](https://mermaid.ink/img/){base64_string}"
-                    response = requests.get(url, timeout=15)
+        return asset
+
+
+# class DirectiveMarkdownAdapter:
+#     def __init__(
+#         self,
+#         parser: MarkdownParser
+#     ):
+#         self.parser = parser
+
+#     def convert(
+#         self, 
+#         source_path: str,
+#         output_dir: str,
+#         **kwargs
+#     ) -> str:     
+
+#         markdown = kwargs.get("raw_markdown")
+#         if markdown is None:
+#             markdown = self.parser.read_markdown(source_path)
+
+#         node: ComponentNode = kwargs.get('node')
+#         # node.inspection.directives
+        
+#         parsed = self.parser.parse(markdown)
+
+#         for directive in node.inspection.directives:
+#             index = directive.index
+#             parsed_directive = parsed.find_directive_by_id(index)
+
+#             markdown = markdown.replace(
+#                 parsed_directive.raw,
+#                 node.resolution.content,
+#                 1
+#             )
+            
+
+#         processed = markdown
+
+#         return processed
+
+
+# class DirectivePostProcessor:
+#     def process(
+#         self,
+#         node: ComponentNode,
+#         content: ComponentContent,
+#     ) -> ComponentContent:
+
+
+#         markdown.replace(
+#             directive.span,
+#             placeholder,
+#         )
+
+#         markdown = content.markdown
+#         processed = markdown
+
+#         for directive in node.inspection.directives:
+#             handler = directive.name
+#             raw = directive.raw
+
+#             if handler is None:
+#                 continue
+
+#             placeholder = Placeholder(
+#                 type="docx",
+#                 asset_id=directive.arguments[0],
+#             )
+#             handler.process(
+#                 markdown,
+#                 directive,
+#                 content.assets,
+#             )
+
+#         return content
+
+
+    # def _convert_inline_mermaid(self, raw_markdown: str, output_resource_dir: str) -> str:
+    #     """Scans rendered text for inline mermaid code blocks and translates them into static images."""
+    #     mermaid_pattern = r'```mermaid\s*\n(.*?)\n```'
+    #     matches = re.findall(mermaid_pattern, raw_markdown, re.DOTALL)
+    #     if not matches:
+    #         return raw_markdown
+
+    #     processed_markdown = raw_markdown
+    #     os.makedirs(output_resource_dir, exist_ok=True)
+
+    #     for _, diagram_code in enumerate(matches):
+    #         # Cria uma assinatura única baseada no próprio código do diagrama
+    #         diagram_hash = self.cache.calculate_text_hash(diagram_code)
+    #         diagram_id = f"inline_diagram_{diagram_hash[:10]}"
+            
+    #         image_filename = f"rendered_{diagram_id}.png"
+    #         output_image_path = os.path.join(output_resource_dir, image_filename)
+            
+    #         # Verificação de cache nativa
+    #         if self.cache.is_cached(diagram_id, diagram_hash, [output_image_path]):
+    #             logger.info(f"Cache hit for inline diagram '{diagram_id}'. Reusing PNG asset.")
+    #             image_markdown_tag = f"\n\n![System Diagram]({output_image_path})\n\n"
+    #         else:
+    #             logger.info(f"Cache miss for inline diagram '{diagram_id}'. Fetching cloud render...")
+    #             try:
+    #                 graph_bytes = diagram_code.encode('utf-8')
+    #                 base64_bytes = base64.b64encode(graph_bytes)
+    #                 base64_string = base64_bytes.decode('utf-8')
                     
-                    if response.status_code == 200:
-                        with open(output_image_path, 'wb') as f:
-                            f.write(response.content)
-                        image_markdown_tag = f"\n\n![System Diagram]({output_image_path})\n\n"
-                        self.cache.update_cache(diagram_id, diagram_hash, [output_image_path])
-                    else:
-                        image_markdown_tag = f"\n\n```mermaid\n{diagram_code}\n```\n\n"
-                except Exception as e:
-                    logger.error(f"Failed to render inline mermaid block: {e}")
-                    image_markdown_tag = f"\n\n```mermaid\n{diagram_code}\n```\n\n"
+    #                 url = f"[https://mermaid.ink/img/](https://mermaid.ink/img/){base64_string}"
+    #                 response = requests.get(url, timeout=15)
+                    
+    #                 if response.status_code == 200:
+    #                     with open(output_image_path, 'wb') as f:
+    #                         f.write(response.content)
+    #                     image_markdown_tag = f"\n\n![System Diagram]({output_image_path})\n\n"
+    #                     self.cache.update_cache(diagram_id, diagram_hash, [output_image_path])
+    #                 else:
+    #                     image_markdown_tag = f"\n\n```mermaid\n{diagram_code}\n```\n\n"
+    #             except Exception as e:
+    #                 logger.error(f"Failed to render inline mermaid block: {e}")
+    #                 image_markdown_tag = f"\n\n```mermaid\n{diagram_code}\n```\n\n"
             
-            full_block_to_replace = f"```mermaid\n{diagram_code}\n```"
-            processed_markdown = processed_markdown.replace(full_block_to_replace, image_markdown_tag)
+    #         full_block_to_replace = f"```mermaid\n{diagram_code}\n```"
+    #         processed_markdown = processed_markdown.replace(full_block_to_replace, image_markdown_tag)
             
-        return processed_markdown
+    #     return processed_markdown
 
-class MarkdownFieldTemplateAdapter(BaseContentAdapter):
-    def __init__(self, jinja_env: Any):
-        self.jinja_env = jinja_env
+# class MarkdownFieldTemplateAdapter(BaseContentAdapter):
+#     # def __init__(self, jinja_env: Any):
+#     #     self.jinja_env = jinja_env
 
-    def convert(self, source_path: str, output_dir: str, **kwargs) -> str:
-        raw_markdown = kwargs.get('raw_markdown')
-        user_inputs: Dict[str, Any] = kwargs.get('user_inputs')
-        output_dir = kwargs.get('raw_markdown', output_dir)
+#     def convert(self, source_path: str, output_dir: str, **kwargs) -> str:
+#         raw_markdown = kwargs.get('raw_markdown')
+#         user_inputs: Dict[str, Any] = kwargs.get('user_inputs')
+#         output_dir = kwargs.get('raw_markdown', output_dir)
 
-        if user_inputs is None:
-            raise FileNotFoundError(f"'user_inputs' must be given.")
+#         if user_inputs is None:
+#             raise FileNotFoundError(f"'user_inputs' must be given.")
 
-        if (raw_markdown is None) and (not os.path.exists(source_path)):
-            raise FileNotFoundError(f"External Markdown file missing: {source_path}")
+#         if (raw_markdown is None) and (not os.path.exists(source_path)):
+#             raise FileNotFoundError(f"External Markdown file missing: {source_path}")
         
-        if raw_markdown is None:
-            with open(source_path, 'r', encoding='utf-8') as file:
-                raw_markdown = f"\n\n{file.read()}\n\n"
+#         if raw_markdown is None:
+#             with open(source_path, 'r', encoding='utf-8') as file:
+#                 raw_markdown = f"\n\n{file.read()}\n\n"
         
-        return self._render_a_render(raw_markdown, user_inputs, output_dir)
+#         return self._render_a_render(raw_markdown, user_inputs, output_dir)
 
         
-    def _render_a_render(
-            self, 
-            raw_markdown: 
-            str, user_inputs: Dict[str, Any], 
-            output_resource_dir: str
-        ) -> str:
-        """Loads the markdown file, injects context data, and cleans inner syntax blocks."""
-        # 1. Faz o parse do Front Matter e lê o corpo do arquivo
-        parser = MarkdownParser()
-        _, body = parser.parse_front_matter_from_content(raw_markdown)
+#     def _render_a_render(
+#             self, 
+#             raw_markdown: 
+#             str, user_inputs: Dict[str, Any], 
+#             output_resource_dir: str
+#         ) -> str:
+#         """Loads the markdown file, injects context data, and cleans inner syntax blocks."""
+#         # 1. Faz o parse do Front Matter e lê o corpo do arquivo
+#         parser = MarkdownParser()
+#         _, body = parser.parse_front_matter_from_content(raw_markdown)
         
-        # 2. Injeta as variáveis do usuário via Jinja
-        jinja_template = self.jinja_env.from_string(body)
-        rendered_text = jinja_template.render(user_inputs)
+#         # 2. Injeta as variáveis do usuário via Jinja
+#         jinja_template = self.jinja_env.from_string(body)
+#         rendered_text = jinja_template.render(user_inputs)
         
-        # 3. INTERCEPTAÇÃO INLINE: Limpa o texto traduzindo os blocos dinâmicos embutidos
-        # Se no futuro você quiser interceptar equações complexas ou shorts codes, a regra entra aqui!
-        # final_processed_text = self.convert_inline_mermaid(rendered_text, output_resource_dir)
+#         # 3. INTERCEPTAÇÃO INLINE: Limpa o texto traduzindo os blocos dinâmicos embutidos
+#         # Se no futuro você quiser interceptar equações complexas ou shorts codes, a regra entra aqui!
+#         # final_processed_text = self.convert_inline_mermaid(rendered_text, output_resource_dir)
         
-        return rendered_text
+#         return rendered_text
     
 # Adicione/Atualize em core/adapters.py
 # import os
@@ -302,3 +485,4 @@ class MarkdownFieldTemplateAdapter(BaseContentAdapter):
 #             processed_markdown = processed_markdown.replace(full_block_to_replace, image_markdown_tag)
             
 #         return processed_markdown
+

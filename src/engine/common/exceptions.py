@@ -6,3 +6,9 @@ class NodeAlreadyRegistered(BaseDocException):
 
 class NodeNotFoundException(BaseDocException):
     pass
+
+class ResolutionException(BaseDocException):
+    pass
+
+class DownloadException(BaseDocException):
+    pass

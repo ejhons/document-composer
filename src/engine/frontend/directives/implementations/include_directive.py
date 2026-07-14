@@ -1,3 +1,4 @@
+from engine.common.models.placeholder import NodePlaceholder
 from engine.common.models.recipe import ComponentConfig
 from engine.frontend.syntax.directives import DirectiveCall
 from engine.planner.planning_context import PlanningContext
@@ -42,16 +43,22 @@ class IncludeDirectiveHandler(BaseDirectiveHandler):
             )
 
             existing = ComponentNode(component=component)
-            # graph.add_node(existing)
             result.created_nodes.append(existing)
 
         dependency = Dependency(
             source_id=current_node.id,
             target_id=existing.id,
-            kind='directive'
+            kind='directive',
+            origin = str(directive.index)
         )
         # graph.add_dependency(dependency)
+
+        # result.resolved = True
         result.dependencies.append(dependency)
+
+        # if not current_node.resolution.resolved_inputs:
+        #     result.placeholder = NodePlaceholder(node_id=existing.id)#f'__dc:node:{existing.id}__'
+            
         return result
         #     current_node.id,
         #     existing.id

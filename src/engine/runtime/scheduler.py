@@ -1,8 +1,6 @@
 import logging
-from typing import Dict, List, Any, Optional
-
-from engine.runtime.execution_plan import ExecutionPlan, ExecutionStep
-from engine.common.models.runtime import ExecutionTask
+from engine.planner.graph.topology import Topology
+from engine.runtime.execution.execution_plan import ExecutionPlan, ExecutionStep
 from engine.planner.graph.graph import RecipeGraph
 
 logger = logging.getLogger("doc_engine.scheduler")
@@ -11,17 +9,18 @@ logger = logging.getLogger("doc_engine.scheduler")
 class Scheduler:
     def __init__(
             self,
-            graph: RecipeGraph,
-            ordered_steps: list[ExecutionStep]
+            topology: Topology | None = None,
+            ordered_steps: list[ExecutionStep] = []
     ):
-        self.graph = graph
+        self.topology = topology or Topology()
         self.ordered_steps = ordered_steps
 
     def schedule(
         self,
         graph: RecipeGraph
     ) -> ExecutionPlan:
-        ordered = graph.topological_order()
+        # print(graph)
+        ordered = self.topology.topological_order(graph)
         steps = []
 
         for order, node in enumerate(ordered):
@@ -36,9 +35,8 @@ class Scheduler:
                 )
             )
 
-        return ExecutionPlan(
-            steps=steps
-        )
+        self.ordered_steps = steps
+        return ExecutionPlan(steps=steps)
 
 
 # class TaskScheduler:

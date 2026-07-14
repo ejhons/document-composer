@@ -21,6 +21,9 @@ class RecipeGraph(BaseModel):
     def add_dependency(self, dependency: Dependency):
         self._validate_dependency(dependency)
         self.edges.append(dependency)
+    
+    def get_dependency(self, node_id: str) -> list[Dependency]:
+        return [dep for dep in self.edges if dep.source_id==node_id]
 
     def _validate_dependency(self, dependency: Dependency):
         if dependency.source_id not in self.nodes:
@@ -85,9 +88,14 @@ class RecipeGraph(BaseModel):
             if edge.target_id == node_id
             ]
 
+    @property
     def leaves(self):
-        return [node for node in self.nodes.values() if len(self.children(node.id)==0)]
+        return [node for node in self.nodes.values() if len(self.children(node.id))==0]
     
-
+    @property
     def roots(self):
-        return [node for node in self.nodes.values() if len(self.parents(node.id)==0)]
+        return [node for node in self.nodes.values() if len(self.parents(node.id))==0]
+
+
+class SolvedGraph(RecipeGraph):
+    pass

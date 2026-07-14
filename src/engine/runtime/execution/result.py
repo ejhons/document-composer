@@ -1,15 +1,13 @@
 from pydantic import BaseModel, Field
-
-from engine.runtime.artifacts import OutputArtifact
-from engine.runtime.context import ExecutionContext
-from engine.common.models.inspection import Diagnostic
-from engine.planner.graph.dependency_queue import PendingResolution
+from engine.planner.graph.graph import RecipeGraph
 
 
 class EngineResult(BaseModel):
-    outputs: dict[str, OutputArtifact]
-    diagnostics: list[Diagnostic]
-    execution_time: float
+    completed: bool
+    graph: RecipeGraph | None = None
+    # outputs: dict[str, OutputArtifact]
+    # diagnostics: list[Diagnostic]
+    # execution_time: float
 
 class RuntimeResolutionResult(BaseModel):
     changed: bool = False

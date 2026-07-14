@@ -36,6 +36,14 @@ class ComponentConfig(BaseModel):
     context: dict[str, Any] = Field(default_factory=dict)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
+    @property
+    def solvable(self):
+        return (
+            self.type == 'template'
+            or
+            self.file_format == 'md'
+        )
+
     @model_validator(mode="after")
     def infer_file_format(self):
         if self.file_format is not None:

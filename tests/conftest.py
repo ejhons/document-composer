@@ -3,7 +3,7 @@ from pathlib import Path
 
 # Encontra todos os arquivos .py dentro de tests/fixtures/ (ignorando __init__.py)
 fixtures_dir = Path(__file__).parent / "fixtures"
-print(fixtures_dir)
+# print(fixtures_dir)
 plugins = [
     f"tests.fixtures.{p.stem}"
     for p in fixtures_dir.glob("*.py")
