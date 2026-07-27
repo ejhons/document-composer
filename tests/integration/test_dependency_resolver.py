@@ -13,7 +13,8 @@ def test_markdown_pipeline_enriches_recipe_graph(
     temp_workspace,
     markdown_file,
     recipe_manifest,
-    planning_context
+    planning_context,
+    resource_resolver
 ):
     """
     Pipeline completo:
@@ -75,7 +76,7 @@ fields:
         )
     )
 
-    graph = RecipeGraphBuilder(context=planning_context).build(
+    graph = RecipeGraphBuilder(resource_resolver).build(#context=planning_context
         recipe_manifest
     )
 
@@ -96,7 +97,8 @@ fields:
     inspector_pipeline = InspectionPipeline()
     inspector_pipeline.execute(
         graph=graph,
-        planning_context=planning_context
+        inspector_registry=planning_context.inspector_registry
+        # planning_context=planning_context
     )
 
     resolver = DependencyResolver()

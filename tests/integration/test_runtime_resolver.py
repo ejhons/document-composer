@@ -13,7 +13,8 @@ def test_capturing_variables_in_markdown(
     temp_workspace,
     recipe_manifest,
     markdown_file,
-    planning_context
+    planning_context,
+    resource_resolver
 ):
     # Cria um arquivo markdown em uma pasta temporária
     markdown_file(
@@ -54,7 +55,7 @@ graph TD
         temp_workspace / "test_resolver.md"
     ).as_posix()
     
-    graph = RecipeGraphBuilder(context=planning_context).build(
+    graph = RecipeGraphBuilder(resource_resolver).build(
         recipe_manifest
     )
     
@@ -75,7 +76,8 @@ graph TD
     inspector_pipeline = InspectionPipeline()
     inspector_pipeline.execute(
         graph=graph,
-        planning_context=planning_context
+        inspector_registry=planning_context.inspector_registry
+        # planning_context=planning_context
     )
 
     resolver = RuntimeResolver()

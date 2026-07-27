@@ -1,6 +1,4 @@
 from pydantic import BaseModel, Field
-from engine.common.models.placeholder import NodePlaceholder
-from engine.common.utils.generator import IdGenerator
 from engine.planner.graph.component_node import ComponentNode, Dependency
 
 

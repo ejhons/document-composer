@@ -1,3 +1,4 @@
+from typing import Any
 from pydantic import BaseModel, Field
 from engine.common.models.assets import ComponentContent
 from engine.common.models.inspection import InspectionResult
@@ -26,7 +27,7 @@ class Dependency(BaseModel):
     kind: str
     origin: str | None = None
 
-
+ComponentNode.model_rebuild()
 
 
 

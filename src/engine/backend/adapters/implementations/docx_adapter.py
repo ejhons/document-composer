@@ -6,7 +6,7 @@ from engine.common.models.assets import Asset, AssetBundle, ComponentContent
 from engine.common.models.workspace import Workspace
 from engine.frontend.parser import MarkdownParser
 from engine.planner.graph.component_node import ComponentNode
-from engine.planner.planning_context import PlanningContext
+# from engine.planner.planning_context import PlanningContext
 
 
 class DocxAdapter(BaseContentAdapter):
@@ -20,7 +20,7 @@ class DocxAdapter(BaseContentAdapter):
     def convert(
         self,
         node: ComponentNode,
-        context: PlanningContext,
+        # context: PlanningContext,
         workspace: Workspace,
         # source_path: str,
         # output_dir: str,
@@ -50,7 +50,7 @@ class DocxPostCompileAdapter(BaseContentAdapter):
     def convert(
         self,
         node: ComponentNode,
-        context: PlanningContext,
+        # context: PlanningContext,
         workspace: Workspace,
         **kwargs
         # source_path: str,

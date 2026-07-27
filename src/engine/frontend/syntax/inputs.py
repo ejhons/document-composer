@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class VariableReference(BaseModel):
+class InputReference(BaseModel):
     name: str
     raw: str
     index: int | None = None

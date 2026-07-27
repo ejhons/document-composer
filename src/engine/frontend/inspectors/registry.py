@@ -1,7 +1,7 @@
 from engine.frontend.inspectors.implementations.inspector import BaseOjbjectInspector
 
 
-class StaticInspectorRegistry:
+class StaticInspectorRegistry():
     '''
     Relaciona o formato do arquivo com o Inspetor adequado.
     '''

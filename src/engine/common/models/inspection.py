@@ -1,13 +1,13 @@
 from typing import Literal
 from pydantic import BaseModel, Field
 from engine.frontend.syntax.directives import DirectiveCall
-from engine.frontend.syntax.fields import FieldDefinition
-from engine.frontend.syntax.variables import VariableReference
+from engine.frontend.syntax.fields import InputDefinition
+from engine.frontend.syntax.inputs import InputReference
 
 class InspectionResult(BaseModel):
     body: str | None = None
-    fields: dict[str, FieldDefinition] = Field(default_factory=dict)
-    variables: list["VariableReference"] = Field(default_factory=list) # type: ignore
+    fields: dict[str, InputDefinition] = Field(default_factory=dict)
+    variables: list["InputReference"] = Field(default_factory=list) # type: ignore
     directives: list["DirectiveCall"] = Field(default_factory=list) # type: ignore
     diagnostics: list[Diagnostic] = Field(default_factory=list)
     metadata:dict[str, str] = Field(default_factory=dict)
@@ -16,7 +16,7 @@ class InspectionResult(BaseModel):
         return self.body is not None
     
     @property
-    def unique_variables(self) -> dict[str, VariableReference]:
+    def unique_variables(self) -> dict[str, InputReference]:
         return {
             ref.name: ref
             for ref in self.variables

@@ -1,11 +1,11 @@
 from typing import Any, Optional
 from abc import ABC, abstractmethod
-from engine.common.models.recipe import RecipeManifest
+from engine.frontend.syntax.markdown.atomized_markdown import AtomizedMarkdown
 
 # =====================================================================
 # 1. THE OUTPUT PORT (Abstract Base Class)
 # =====================================================================
-class BaseCompilerAdapter(ABC):
+class BaseCompiler(ABC):
     """
     The Output Port contract for document generation.
     Every format exporter (Docx, Pdf, Html) must satisfy this interface.
@@ -19,14 +19,27 @@ class BaseCompilerAdapter(ABC):
 
     @abstractmethod
     def compile(
-        self, 
-        source_markdown_path: str,
+        self,
+        fragmented_markdown: AtomizedMarkdown,
+        session,
         output_path: str,
-        manifest: RecipeManifest,
+        # source_markdown_path: str,
+        # manifest: RecipeManifest,
         **kwargs
     ) -> str:
         """Translates the compiled Markdown into the target binary format layout."""
         pass
+
+    # @abstractmethod
+    # def compile(
+    #     self, 
+    #     source_markdown_path: str,
+    #     output_path: str,
+    #     manifest: RecipeManifest,
+    #     **kwargs
+    # ) -> str:
+    #     """Translates the compiled Markdown into the target binary format layout."""
+    #     pass
 
 
 

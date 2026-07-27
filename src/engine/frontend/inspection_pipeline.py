@@ -1,16 +1,16 @@
-from engine.planner.planning_context import PlanningContext
-
+from engine.frontend.inspectors.registry import StaticInspectorRegistry
 
 class InspectionPipeline:
     def execute(
         self,
         graph,
-        planning_context: PlanningContext,
-    ) -> dict[str, bool]:
+        # planning_context: PlanningContext,
+        inspector_registry: StaticInspectorRegistry
+    ):# -> dict[str, bool]:
         # inspected = {}
         for node in graph.nodes.values():
             # Até então, o único inspector resgistrado é o de Markdown.
-            inspector = planning_context.inspector_registry.get(
+            inspector = inspector_registry.get(
                 node.component.file_format
             )
             if inspector is None:

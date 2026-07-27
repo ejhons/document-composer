@@ -1,16 +1,33 @@
 import os
 import pypandoc
 from engine.common.models.recipe import RecipeManifest
-from engine.backend.compilers.base import BaseCompilerAdapter
+from engine.backend.compilers.base import BaseCompiler
 
-class HtmlCompilerAdapter(BaseCompilerAdapter):
-    def compile(self, source_markdown_path: str, output_path: str, manifest: RecipeManifest, **kwargs) -> str:
+class HtmlCompiler(BaseCompiler):
+    def compile(
+        self,
+        source_markdown_path: str,
+        output_path: str,
+        manifest: RecipeManifest,
+        **kwargs
+    ) -> str:
         standalone = kwargs.get('standalone', True)
         """Standard compilation for browser consumption."""
-        return self._execute_pypandoc_html(source_markdown_path, output_path, manifest, standalone=standalone)
+        return self._execute_pypandoc_html(
+            source_markdown_path,
+            output_path,
+            manifest,
+            standalone=standalone
+        )
     
     # def compile(self, source_markdown_path: str, output_path: str, manifest: RecipeManifest) -> str:
-    def _execute_pypandoc_html(self, source_markdown_path: str, output_path: str, manifest: RecipeManifest, standalone: bool) -> str:
+    def _execute_pypandoc_html(
+        self,
+        source_markdown_path: str, 
+        output_path: str,
+        manifest: RecipeManifest,
+        standalone: bool
+    ) -> str:
         style = manifest.style
         # CSS puro e simples aceito pelo xhtml2pdf e navegadores
         css_content = (
@@ -121,7 +138,7 @@ class HtmlCompilerAdapter(BaseCompilerAdapter):
         return output_path
 
 
-class HtmlCompilerAdapter(BaseCompilerAdapter):
+class HtmlCompiler(BaseCompiler):
     def compile(self, source_markdown_path: str, output_path: str, manifest: RecipeManifest, **kwargs) -> str:
         standalone = kwargs.get('standalone', True)
         """Standard compilation for browser consumption."""

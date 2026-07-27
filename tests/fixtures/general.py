@@ -2,7 +2,8 @@ import os
 from pathlib import Path
 import shutil
 import pytest
-from engine.frontend.syntax.fields import FieldDefinition
+from engine.frontend.syntax.fields import InputDefinition
+from engine.planner.resources.resource_resolver import LocalResourceResolver
 
 
 
@@ -26,37 +27,42 @@ from engine.frontend.syntax.fields import FieldDefinition
 #     return _factory
 
 @pytest.fixture
+def resource_resolver():
+    return LocalResourceResolver()
+
+
+@pytest.fixture
 def text_field_definition():
-    return FieldDefinition(
-        data_type='text',
-        label='test text field',
+    return InputDefinition(
+        type='text',
+        name='test text field',
         description='a simple tag field text',
         default='dummy value'
     )
 
 @pytest.fixture
 def number_field_definition():
-    return FieldDefinition(
-        data_type='number',
-        label='test number field',
+    return InputDefinition(
+        type='number',
+        name='test number field',
         description='a simple tag field number',
         default=1.05
     )
 
 @pytest.fixture
 def date_field_definition():
-    return FieldDefinition(
-        data_type='date',
-        label='test date field',
+    return InputDefinition(
+        type='date',
+        name='test date field',
         description='a simple tag field date',
         default='dummy date'
     )
 
 @pytest.fixture
 def tabele_field_definition():
-    return FieldDefinition(
-        data_type='table',
-        label='test table field',
+    return InputDefinition(
+        type='table',
+        name='test table field',
         description='a simple tag field table',
         default='dummy table'
     )
@@ -81,6 +87,9 @@ def dummy_markdown():
         '   flow:\n'
         '       type: number\n'
         '       label: Vazão\n'
+        '   city_idf:\n'
+        '       type: text\n'
+        '       label: IDF do Local\n'
         '---\n'
         '# Memorial\n'
         'Cliente: {{ client.name }}\n'

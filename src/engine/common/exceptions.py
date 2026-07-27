@@ -12,3 +12,6 @@ class ResolutionException(BaseDocException):
 
 class DownloadException(BaseDocException):
     pass
+
+class GraphNotSolvedException(BaseDocException):
+    pass

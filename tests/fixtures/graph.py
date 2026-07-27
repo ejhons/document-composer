@@ -8,7 +8,6 @@ from engine.planner.resolution.resolution_state import ResolutionState
 
 @pytest.fixture
 def empty_graph():
-
     return RecipeGraph()
 
 @pytest.fixture
@@ -73,3 +72,41 @@ def make_node():
 
         return node
     return _build
+
+
+@pytest.fixture
+def node_a():
+    return ComponentNode(
+        id="A",
+        component=ComponentConfig(
+            type="template",
+            source="a.md"
+        )
+    )
+
+
+@pytest.fixture
+def node_b():
+    return ComponentNode(
+        id="B",
+        component=ComponentConfig(
+            type="template",
+            source="b.md"
+        )
+    )
+
+
+@pytest.fixture
+def node_c():
+    return ComponentNode(
+        id="C",
+        component=ComponentConfig(
+            type="template",
+            source="c.md"
+        )
+    )
+
+
+@pytest.fixture
+def graph():
+    return RecipeGraph()

@@ -1,14 +1,14 @@
 
 import pytest
 
+from build.lib.engine.execution.engine import Engine
 from engine.backend.compilers.registry import CompilerRegistry
 from engine.frontend.inspection_pipeline import InspectionPipeline
-from engine.planner.resolution.pending_resolution import PendingCollector
+from engine.planner.resolution.resolution_collector import PendingCollector
 from engine.planner.resolution.dependency_resolver import DependencyResolver
 from engine.planner.resolution.runtime_resolver import RuntimeResolver
 from engine.planner.graph.topology import Topology
 from engine.planner.planning_context import PlanningContext
-from engine.runtime.engine import Engine
 from engine.runtime.scheduler import Scheduler
 
 

@@ -1,63 +1,18 @@
 import re
-from typing import Any, Dict, Tuple
-from dataclasses import Field
+from typing import Any, Dict, Optional, Tuple
+from pydantic import Field
 from pydantic import BaseModel
 from engine.frontend.parser import MarkdownParser
 from engine.frontend.syntax.expressions.parser import ExpressionParser
-from engine.frontend.syntax.fields import FieldDefinition
+from engine.frontend.syntax.fields import InputDefinition
 from engine.frontend.syntax.directives import DirectiveArgument, DirectiveCall, TextSpan
-from engine.frontend.syntax.markdown.fragments import MarkdownBlock, MarkdownDirective, MarkdownFragment
-from engine.frontend.syntax.variables import VariableReference
-
-class MarkdownAtomizer:    
-    def __init__(
-        self, 
-        parser: MarkdownParser | None = None
-    ):
-        self.parser = parser or MarkdownParser()
-        
-
-    def atomize(self, markdown:str) -> FragmentedMarkdown:
-        '''
-        Nesse ponto o markdown já deve ter sido tratado
-        sem a existência de variáveis.
-        '''        
-        parsed = self.parser.parse(markdown)
-
-        body = parsed.body
-        directives = parsed.directives
-
-        fragmented = FragmentedMarkdown()
-
-        if not directives:
-            fragmented.blocks.append(MarkdownFragment(text=body))
-            return fragmented
-
-        cursor = 0
-        for directive in directives:
-            directive.arguments
-            start = directive.start.index
-            end = directive.end.index
-
-            # Texto anterior
-            if start > cursor:
-                fragmented.blocks.append(MarkdownFragment(text=body[cursor:start]))
-            # Diretiva
-            fragmented.blocks.append(MarkdownDirective(directive=directive))
-
-            cursor = end
-
-        # Restante
-        if cursor < len(body):
-            fragmented.blocks.append(MarkdownFragment(text=markdown[cursor:]))
-
-        return fragmented
-    
+from engine.frontend.syntax.markdown.atom import MarkdownAtom, MarkdownDirective, MarkdownFragment
+from engine.frontend.syntax.inputs import InputReference
 
         
-class FragmentedMarkdown(BaseModel):
-    body: str
-    block: list[MarkdownBlock] = Field(default_factory=list)
+class AtomizedMarkdown(BaseModel):
+    body: Optional[str] = None
+    blocks: list[MarkdownAtom] = Field(default_factory=list)
 
 
 

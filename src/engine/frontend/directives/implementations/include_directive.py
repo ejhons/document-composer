@@ -1,4 +1,4 @@
-from engine.common.models.placeholder import NodePlaceholder
+# from engine.common.models.placeholder import NodePlaceholder
 from engine.common.models.recipe import ComponentConfig
 from engine.frontend.syntax.directives import DirectiveCall
 from engine.planner.planning_context import PlanningContext

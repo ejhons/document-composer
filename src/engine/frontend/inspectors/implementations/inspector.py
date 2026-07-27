@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from engine.frontend.inspectors.base import BaseOjbjectInspector
 from engine.frontend.parser import MarkdownParser
 from engine.common.models.inspection import InspectionResult

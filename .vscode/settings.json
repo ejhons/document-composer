@@ -9,5 +9,8 @@
         // "activityBar.background": "#000000",
         // "terminal.foreground": "#ed0000",
         "titleBar.activeBackground": "#780202"
-    }
+    },
+    "python.analysis.autoImportCompletions": true,
+    "better-comments.multilineComments": true,
+    "better-comments.highlightPlainText": false
 }

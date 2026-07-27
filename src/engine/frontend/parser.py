@@ -1,13 +1,14 @@
 import os
+from pprint import pprint
 import re
 import yaml
 from typing import Any, Dict, Tuple
 
 from engine.frontend.syntax.directives import DirectiveArgument, DirectiveCall, Expression, TextSpan
 from engine.frontend.syntax.expressions.parser import ExpressionParser
-from engine.frontend.syntax.fields import FieldDefinition
+from engine.frontend.syntax.fields import InputDefinition
 from engine.frontend.syntax.parsed_markdown import ParsedMarkdown
-from engine.frontend.syntax.variables import VariableReference
+from engine.frontend.syntax.inputs import InputReference
 
 
 DIRECTIVE_START = re.compile(
@@ -41,35 +42,53 @@ class MarkdownParser:
     
     def parse_file(self, file_path:str) -> ParsedMarkdown:
         content = self.read_markdown(file_path)
+        return self.parse(content)
         
-        metadata, body = self.parse_front_matter(content)
-        fields = self.extract_fields(metadata)
-        variables = self.extract_variables(body)
-        directives = self.extract_directives(body)
+        # metadata, body = self.parse_front_matter(content)
+        # fields = self.extract_fields(metadata)
+        # variables = self.extract_variables(body)
+        # definitions = self.merge_fields_and_variables(fields, variables)
+        # directives = self.extract_directives(body)
 
-        return ParsedMarkdown(
-            metadata=metadata,
-            fields=fields,
-            variables=variables,
-            directives=directives,
-            body=body
-        )
+        # return ParsedMarkdown(
+        #     metadata=metadata,
+        #     fields=definitions, #fields,
+        #     # variables=variables,
+        #     directives=directives,
+        #     body=body
+        # )
 
     def parse(self, content:str) -> ParsedMarkdown:
-        # content = self.read_markdown(file_path)
         
         metadata, body = self.parse_front_matter(content)
         fields = self.extract_fields(metadata)
         variables = self.extract_variables(body)
+        definitions = self.merge_fields_and_variables(fields, variables)
         directives = self.extract_directives(body)
 
-        return ParsedMarkdown(
+        parsed = ParsedMarkdown(
             metadata=metadata,
-            fields=fields,
-            variables=variables,
-            directives=directives,
+            fields=definitions, #fields,
+            # variables=variables,
+            # directives=directives,
             body=body
         )
+        parsed.directives = directives
+        return parsed
+        # content = self.read_markdown(file_path)
+        
+        # metadata, body = self.parse_front_matter(content)
+        # fields = self.extract_fields(metadata)
+        # variables = self.extract_variables(body)
+        # directives = self.extract_directives(body)
+
+        # return ParsedMarkdown(
+        #     metadata=metadata,
+        #     fields=fields,
+        #     variables=variables,
+        #     directives=directives,
+        #     body=body
+        # )
 
     
     def parse_front_matter(self, content: str) -> Tuple[Dict[str, Any], str]:
@@ -82,27 +101,21 @@ class MarkdownParser:
             return metadata, body_content
         
         return {}, content
-
     
-    def extract_fields(self, metadata: dict[str, Any]) -> dict[str, FieldDefinition]:
+    def extract_fields(self, metadata: dict[str, Any]) -> dict[str, InputDefinition]:
         # Extrai o campo 'fields' do dicionário
         fields = metadata.pop('fields', {})
 
+        pprint(fields)
+
         return {
-            key: FieldDefinition(**field)
+            key: InputDefinition(name=key, declared=True, **field)
             for key, field 
             in fields.items()
             }
 
 
-    
-    # def extract_variables(self, content: str) -> list[VariableReference]:
-    #     """Scans raw text to discover all Jinja2 placeholders like {{ variable_name }}."""
-    #     found_tokens = re.findall(r'\{\{\s*(.*?)\s*\}\}', content)
-    #     return [VariableReference(name=token) for token in found_tokens]
-
-    
-    def extract_variables(self, content: str) -> list[VariableReference]:
+    def extract_variables(self, content: str) -> list[InputReference]:
         """
         Scans the Markdown content looking for Jinja expressions.
         Examples:
@@ -110,7 +123,7 @@ class MarkdownParser:
             {{ area | round(2) }}
             {{ width * height }}
         """
-        variables: list[VariableReference] = []
+        variables: list[InputReference] = []
         pattern = re.compile(r"(\{\{\s*(.*?)\s*\}\})")
 
         for idx, match in enumerate(pattern.finditer(content)):
@@ -118,7 +131,7 @@ class MarkdownParser:
             expression = match.group(2)   # "area | round(2)"
 
             variables.append(
-                VariableReference(
+                InputReference(
                     name=expression,
                     raw=raw,
                     index=idx
@@ -129,8 +142,25 @@ class MarkdownParser:
 
         return variables
 
+    def merge_fields_and_variables(
+        self,
+        fields: dict[str, InputDefinition],
+        references: list[InputReference],
+    ) -> dict[str, InputDefinition]:
 
+        merged = dict(fields)
 
+        for ref in references:
+            if ref.name not in merged:
+                merged[ref.name] = InputDefinition(
+                    name=ref.name,
+                    declared=False,
+                    type='text'
+                )
+
+            merged[ref.name].references.append(ref)
+
+        return merged
     
     def extract_directives(self, content: str) -> list[DirectiveCall]:
         directives: list[DirectiveCall] = []
@@ -173,45 +203,9 @@ class MarkdownParser:
                         column=column_end,
                         index=end
                     )
-                    # line=line,
-                    # column=column
                 )
             )
         return directives  
-    # def extract_directives(self, content: str) -> list[DirectiveCall]:
-    #     directives: list[DirectiveCall] = []
-    #     for idx, match in enumerate(DIRECTIVE_START.finditer(content)):
-    #         name = match.group(1)
-    #         start = match.start()
-    #         open_paren = content.find("(", match.end() - 1)
-    #         end = self._find_matching_parenthesis(
-    #             content,
-    #             open_paren
-    #         )
-
-    #         if end == -1:
-    #             # posteriormente pode gerar um Diagnostic
-    #             continue
-
-    #         raw = content[start:end + 1]
-    #         arguments_text = content[open_paren + 1:end]
-
-    #         line = content.count("\n", 0, start) + 1
-    #         column = start - content.rfind("\n", 0, start)
-    #         directives.append(
-    #             DirectiveCall(
-    #                 index=idx,
-    #                 name=name,
-    #                 raw=raw,
-    #                 arguments=self.extract_directive_parameters(
-    #                     arguments_text
-    #                 ),
-    #                 line=line,
-    #                 column=column
-    #             )
-    #         )
-    #     return directives
-    
     
     
     def _find_matching_parenthesis(self, text: str, start: int) -> int:
@@ -347,14 +341,6 @@ class MarkdownParser:
                 break
 
         
-        # token = token.strip()
-        # if (
-        #     len(token) >= 2
-        #     and token[0] == token[-1]
-        #     and token[0] in ("'", '"')
-        # ):
-        #     token = token[1:-1]
-        
         value = self.expression_parser.parse(value)
 
         parameters.append(
@@ -363,9 +349,53 @@ class MarkdownParser:
                 expression =  Expression(source=value)
             )
         )
+                # token = token.strip()
+                # if (
+                #     len(token) >= 2
+                #     and token[0] == token[-1]
+                #     and token[0] in ("'", '"')
+                # ):
+                #     token = token[1:-1]
+                
     # 
     # def parse_front_matter(file_path: str) -> Tuple[Dict[str, Any], str]:
     #     """Extracts YAML front matter and the raw Markdown body from a component file."""
     #     with open(file_path, 'r', encoding='utf-8') as file:
     #         content = file.read()
     #     return MarkdownParser.parse_front_matter_from_content(content)
+
+    
+    # def extract_directives(self, content: str) -> list[DirectiveCall]:
+    #     directives: list[DirectiveCall] = []
+    #     for idx, match in enumerate(DIRECTIVE_START.finditer(content)):
+    #         name = match.group(1)
+    #         start = match.start()
+    #         open_paren = content.find("(", match.end() - 1)
+    #         end = self._find_matching_parenthesis(
+    #             content,
+    #             open_paren
+    #         )
+
+    #         if end == -1:
+    #             # posteriormente pode gerar um Diagnostic
+    #             continue
+
+    #         raw = content[start:end + 1]
+    #         arguments_text = content[open_paren + 1:end]
+
+    #         line = content.count("\n", 0, start) + 1
+    #         column = start - content.rfind("\n", 0, start)
+    #         directives.append(
+    #             DirectiveCall(
+    #                 index=idx,
+    #                 name=name,
+    #                 raw=raw,
+    #                 arguments=self.extract_directive_parameters(
+    #                     arguments_text
+    #                 ),
+    #                 line=line,
+    #                 column=column
+    #             )
+    #         )
+    #     return directives
+    

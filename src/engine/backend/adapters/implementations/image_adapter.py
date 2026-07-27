@@ -22,7 +22,7 @@ class ImageMarkdownAdapter(BaseContentAdapter):
     def convert(
         self,
         node: ComponentNode,
-        context: PlanningContext,
+        # context: PlanningContext,
         workspace: Workspace,
         # source_path: str,
         # output_dir: str,

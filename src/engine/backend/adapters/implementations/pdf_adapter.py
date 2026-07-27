@@ -14,16 +14,16 @@ from engine.planner.planning_context import PlanningContext
 class PdfToImageMarkdownAdapter(BaseContentAdapter):
     def __init__(
         self,
-        renderer: PdfRenderer,
-        parser: MarkdownParser
+        renderer: PdfRenderer | None = None,
+        parser: MarkdownParser | None = None
     ):
-        self.renderer = renderer
-        self.parser = parser
+        self.renderer = renderer or PdfRenderer()
+        self.parser = parser or MarkdownParser()
 
     def convert(
         self,
         node: ComponentNode,
-        context: PlanningContext,
+        # context: PlanningContext,
         workspace: Workspace,
         # source_path: str,
         # output_dir: str,

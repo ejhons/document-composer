@@ -3,7 +3,6 @@ import pandas as pd
 from engine.backend.adapters.base import adapter_logger
 from engine.backend.adapters.base import BaseContentAdapter
 from engine.common.models.assets import AssetBundle, ComponentContent
-from engine.common.models.compiled_markdown import CompiledMarkdown
 from engine.common.models.workspace import Workspace
 from engine.planner.graph.component_node import ComponentNode
 from engine.planner.planning_context import PlanningContext
@@ -13,7 +12,7 @@ class ExcelToMarkdownAdapter(BaseContentAdapter):
     def convert(
         self,
         node: ComponentNode,
-        context: PlanningContext,
+        # context: PlanningContext,
         workspace: Workspace
         # source_path: str,
         # output_dir: str

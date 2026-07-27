@@ -1,0 +1,30 @@
+from dataclasses import dataclass, field
+
+from engine.backend.adapters.registry import AdapterRegistry
+from engine.backend.compilers.registry import CompilerRegistry
+from engine.frontend.directives.registry import DirectiveRegistry
+from engine.frontend.inspection_pipeline import InspectionPipeline
+from engine.frontend.inspectors.registry import StaticInspectorRegistry
+from engine.frontend.syntax.markdown.atomizer import MarkdownAtomizer
+from engine.planner.resolution.dependency_resolver import DependencyResolver
+from engine.planner.resolution.resolution_collector import PendingCollector
+from engine.planner.resolution.runtime_resolver import RuntimeResolver
+from engine.planner.resources.base import ResourceResolver
+from engine.planner.resources.resource_resolver import LocalResourceResolver
+
+@dataclass
+class EngineContext:
+    resource_resolver: ResourceResolver 
+
+    inspector_registry: StaticInspectorRegistry = field(default_factory=StaticInspectorRegistry)
+    directive_registry: DirectiveRegistry = field(default_factory=DirectiveRegistry)
+    adapter_registry: AdapterRegistry = field(default_factory=AdapterRegistry)
+    compiler_registry: CompilerRegistry = field(default_factory=CompilerRegistry)
+
+    runtime_resolver: RuntimeResolver = field(default_factory=RuntimeResolver)
+    dependency_resolver: DependencyResolver = field(default_factory=DependencyResolver)
+    pending_collector: PendingCollector = field(default_factory=PendingCollector)
+
+    inspection_pipeline: InspectionPipeline = field(default_factory=InspectionPipeline)
+
+    atomizer: MarkdownAtomizer = field(default_factory=MarkdownAtomizer)

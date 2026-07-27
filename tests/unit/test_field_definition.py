@@ -1,7 +1,7 @@
-from engine.frontend.syntax.fields import FieldDefinition
+from engine.frontend.syntax.fields import InputDefinition
 
 def raise_error_for_undefined_data_type():
-    FieldDefinition(
-        data_type = 'undefined',
-        label = 'dummy'
+    InputDefinition(
+        type = 'undefined',
+        name = 'dummy'
     )

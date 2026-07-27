@@ -1,6 +1,3 @@
-from pprint import pprint
-
-from engine.frontend.directives.implementations.include_directive import IncludeDirectiveHandler
 from engine.frontend.inspection_pipeline import InspectionPipeline
 from engine.frontend.inspectors.implementations.inspector import MarkdownInspector
 from engine.planner.resolution.resolution_state import ResolutionState
@@ -8,6 +5,7 @@ from engine.planner.resolution.runtime_resolver import RuntimeResolver
 from engine.planner.recipe_builder import RecipeGraphBuilder
 from engine.planner.resolution.dependency_resolver import DependencyResolver
 from engine.runtime.execution.context import ExecutionContext
+from engine.frontend.directives.implementations.include_directive import IncludeDirectiveHandler
 
 
 
@@ -15,7 +13,8 @@ def test_markdown_pipeline_enriches_recipe_graph(
     temp_workspace,
     markdown_file,
     recipe_manifest,
-    planning_context
+    planning_context,
+    resource_resolver
 ):
 
     markdown_file(
@@ -88,7 +87,7 @@ graph TD
         )
     )
 
-    graph = RecipeGraphBuilder(context=planning_context).build(
+    graph = RecipeGraphBuilder(resource_resolver).build(
         recipe_manifest
     )
 
@@ -112,13 +111,14 @@ graph TD
     inspector_pipeline = InspectionPipeline()
     inspector_pipeline.execute(
         graph=graph,
-        planning_context=planning_context
+        inspector_registry=planning_context.inspector_registry
     )
     
     inspector_pipeline = InspectionPipeline()
     inspector_pipeline.execute(
         graph=graph,
-        planning_context=planning_context
+        # planning_context=planning_context
+        inspector_registry=planning_context.inspector_registry
     )
 
     for node in graph.nodes.values():

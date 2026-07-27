@@ -3,12 +3,12 @@ import re
 import pypandoc
 from xhtml2pdf import pisa
 from engine.common.models.recipe import RecipeManifest
-from engine.backend.compilers.base import BaseCompilerAdapter
-from engine.backend.compilers.implementations.html_compiler import HtmlCompilerAdapter
+from engine.backend.compilers.base import BaseCompiler
+from engine.backend.compilers.implementations.html_compiler import HtmlCompiler
 
 
 
-class PdfCompilerAdapter(BaseCompilerAdapter):
+class PdfCompiler(BaseCompiler):
     def compile(
             self,
             source_markdown_path: str,
@@ -56,7 +56,7 @@ class PdfCompilerAdapter(BaseCompilerAdapter):
 
         # 2. Instanciamos e reaproveitamos o adaptador de HTML já existente
         # Isso garante que TODO o CSS, cabeçalhos e rodapés gerados lá sejam herdados aqui
-        html_compiler = HtmlCompilerAdapter()
+        html_compiler = HtmlCompiler()
         # html_compiler.compile(source_markdown_path, temp_html_path, manifest)
         html_compiler.compile(source_markdown_path, temp_html_path, manifest, standalone=False)
         # print(f"[Compiler - PDF] Compiling final vector PDF directly from styled HTML blueprint...")

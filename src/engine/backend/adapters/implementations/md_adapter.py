@@ -33,7 +33,7 @@ class MarkdownAdapter(BaseContentAdapter):
     def convert(
         self, 
         node: ComponentNode,
-        context: PlanningContext,
+        # context: PlanningContext,
         workspace: Workspace,
         # source_path: str,
         # output_dir: str,
@@ -47,7 +47,7 @@ class MarkdownAdapter(BaseContentAdapter):
 
         result = self.mermaid_adapter.convert(
             node,
-            context,
+            # context,
             workspace=workspace,
             **kwargs
         )
@@ -74,7 +74,7 @@ class MermaidMarkdownAdapter(BaseContentAdapter):
     def convert(
         self, 
         node: ComponentNode,
-        context: PlanningContext,
+        # context: PlanningContext,
         workspace: Workspace
         # self,
         # source_path: str,

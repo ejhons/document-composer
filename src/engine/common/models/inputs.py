@@ -1,10 +1,12 @@
-from typing import Any
+from pydantic import Field
+from typing import Any, Literal, Optional
 
 
-class InputDefinition:
+class DeprecatedInputDefinition:
     name: str
-    type: str
+    # type: str
     declared: bool
-    label: str | None
-    description: str | None
-    default: Any
+    data_type: Literal["text", "number", "date"] = Field(default="text")
+    label: str | None = None
+    description: Optional[str] = None
+    default: Optional[Any] = None

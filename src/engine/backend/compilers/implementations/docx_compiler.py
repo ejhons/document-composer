@@ -1,10 +1,10 @@
 import os
 import pypandoc
 from engine.common.models.recipe import RecipeManifest
-from engine.backend.compilers.base import BaseCompilerAdapter
+from engine.backend.compilers.base import BaseCompiler
 
 
-class DocxCompilerAdapter(BaseCompilerAdapter):
+class DocxCompiler(BaseCompiler):
     def compile(
             self, 
             source_markdown_path: str,

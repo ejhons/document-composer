@@ -4,7 +4,7 @@ import shutil
 import pytest
 import pandas as pd
 
-from engine.backend.compilers.implementations.docx_compiler import DocxCompilerAdapter
+from engine.backend.compilers.implementations.docx_compiler import DocxCompiler
 from engine.runtime.engine import DocumentEngine
 
 # =====================================================================
@@ -134,7 +134,7 @@ def test_end_to_end_assembly_pipeline(test_environment):
         file.write(final_markdown)
         
     final_docx_path = os.path.join(output_dir, "test_output_report.docx")
-    compiler = DocxCompilerAdapter(engine.manifest)
+    compiler = DocxCompiler(engine.manifest)
     
     compiled_output = compiler.compile_to_docx(temp_markdown_path, final_docx_path)
     

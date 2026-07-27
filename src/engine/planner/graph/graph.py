@@ -1,3 +1,4 @@
+from typing import Any
 from pydantic import BaseModel, Field, PrivateAttr
 from engine.common.exceptions import NodeAlreadyRegistered, NodeNotFoundException
 from engine.planner.graph.component_node import ComponentNode, Dependency
@@ -65,6 +66,11 @@ class RecipeGraph(BaseModel):
             for edge in self.edges
         )
 
+    @property
+    def solved(self):
+        return all(
+            [node.resolution.resolved for node in self.nodes.values()]
+        )
 
 
     def find_by_source(self, source: str):
@@ -99,3 +105,5 @@ class RecipeGraph(BaseModel):
 
 class SolvedGraph(RecipeGraph):
     pass
+
+RecipeGraph.model_rebuild()

@@ -1,4 +1,5 @@
 import pytest
+from engine.backend.adapters.registry import AdapterRegistry
 from engine.frontend.directives.implementations.include_directive import IncludeDirectiveHandler
 from engine.frontend.directives.registry import DirectiveRegistry
 from engine.frontend.inspectors.implementations.inspector import MarkdownInspector
@@ -10,6 +11,7 @@ from engine.planner.resources.resource_resolver import LocalResourceResolver
 @pytest.fixture
 def planning_context():
     resource_resolver=LocalResourceResolver()
+    adapter_registry = AdapterRegistry()
     directive_registry=DirectiveRegistry()
     inspector_registry=StaticInspectorRegistry()
     
@@ -23,6 +25,7 @@ def planning_context():
     )
 
     return PlanningContext(
+        adapter_registry=adapter_registry,
         resource_resolver=resource_resolver,
         directive_registry=directive_registry,
         inspector_registry=inspector_registry
