@@ -1,14 +1,11 @@
 import logging
 from pathlib import Path
-from typing import Any
+from pydantic import BaseModel
 from abc import ABC, abstractmethod
 
-from pydantic import BaseModel
-
-from engine.common.models.assets import AssetBundle, ComponentContent
+from engine.common.models.assets import ComponentContent
 from engine.common.models.workspace import Workspace
 from engine.planner.graph.component_node import ComponentNode
-# from engine.planner.planning_context import PlanningContext
 
 adapter_logger = logging.getLogger("doc_engine.adapters")
 

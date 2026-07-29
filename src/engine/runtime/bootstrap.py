@@ -1,3 +1,8 @@
+
+from warnings import deprecated
+
+
+@deprecated('Unused')
 def create_engine():
 
     planning = PlanningModule(

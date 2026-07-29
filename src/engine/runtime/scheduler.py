@@ -1,11 +1,13 @@
 import logging
+from warnings import deprecated
+
 from engine.planner.graph.topology import Topology
 from engine.runtime.execution.execution_plan import ExecutionPlan, ExecutionStep
 from engine.planner.graph.graph import RecipeGraph
 
 logger = logging.getLogger("doc_engine.scheduler")
 
-
+@deprecated('Unused')
 class Scheduler:
     def __init__(
             self,

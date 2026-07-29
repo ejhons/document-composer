@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Any, Literal
 from pydantic import BaseModel, Field
 from engine.frontend.syntax.directives import DirectiveCall
 from engine.frontend.syntax.fields import InputDefinition
@@ -10,7 +10,7 @@ class InspectionResult(BaseModel):
     variables: list["InputReference"] = Field(default_factory=list) # type: ignore
     directives: list["DirectiveCall"] = Field(default_factory=list) # type: ignore
     diagnostics: list[Diagnostic] = Field(default_factory=list)
-    metadata:dict[str, str] = Field(default_factory=dict)
+    metadata:dict[str, Any] = Field(default_factory=dict)
 
     def __bool__(self):
         return self.body is not None

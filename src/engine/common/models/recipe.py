@@ -19,7 +19,7 @@ class RecipeManifest(BaseModel):
     recipe_name: str
     version: str
     style: StyleConfig
-    components: List[ComponentConfig]
+    components: List[ComponentConfig] = Field(default_factory=list)
     inputs: dict[str, Any] = Field(default_factory=dict)
     # Adicionamos o formato de saída padrão do documento (docx ou pdf)
     target_format: Literal["docx", "pdf", "html"] = Field(default="docx")

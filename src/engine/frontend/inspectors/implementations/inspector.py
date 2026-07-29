@@ -24,9 +24,9 @@ class MarkdownInspector(BaseOjbjectInspector):
 
         result = InspectionResult(
             body = parsed.body,
+            fields=parsed.fields,
             variables=parsed.variables,
             directives=parsed.directives,
-            fields=parsed.fields,
             metadata=parsed.metadata
         )
 

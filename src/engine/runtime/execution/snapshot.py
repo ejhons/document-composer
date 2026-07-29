@@ -1,6 +1,9 @@
+from warnings import deprecated
+
 from engine.planner.graph.graph import RecipeGraph
 
 
+@deprecated('Unused')
 class ExecutionSnapshot():
     graph: RecipeGraph
 

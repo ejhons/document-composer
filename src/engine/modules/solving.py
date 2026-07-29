@@ -3,6 +3,7 @@ from engine.backend.adapters.registry import AdapterRegistry
 from engine.common.exceptions import GraphNotSolvedException, ResolutionException
 from engine.frontend.inspection_pipeline import InspectionPipeline
 from engine.planner.graph.component_node import Dependency
+from engine.planner.planning_context import PlanningContext
 from engine.planner.resolution.dependency_resolver import DependencyResolver
 from engine.runtime.context import EngineContext
 from engine.runtime.execution.result import EngineResult
@@ -28,9 +29,15 @@ class SolvingModule:
         self.max_loops = max_loops
 
         # self.directive_registry = directive_registry
-        self.adapter_registry = context.adapter_registry
-        self.inspector_registry = context.inspector_registry
-        self.inspection_pipeline = context.nspection_pipeline
+        # self.adapter_registry = context.adapter_registry
+        # self.inspector_registry = context.inspector_registry
+        self.inspection_pipeline = context.inspection_pipeline
+        self.plan_context = PlanningContext(
+            resource_resolver=context.resource_resolver,
+            adapter_registry=context.adapter_registry,
+            directive_registry=context.directive_registry,
+            inspector_registry=context.inspector_registry
+        )
 
     def execute(
         self,
@@ -64,17 +71,18 @@ class SolvingModule:
         for _ in range(self.max_loops):
             self.inspection_pipeline.execute(
                 graph,
-                self.inspector_registry
+                self.plan_context.inspector_registry
             )
             # Verifica variáveis e trata os valores
-            for node in graph.nodes.values():
-                self.runtime.resolve(node, context)
+            # for node in graph.nodes.values():
+            #     self.runtime.resolve(node, context)
+            self.runtime.resolve(graph, context)
             # Resolve dependências gerando nós
             self.dependency.resolve(graph, self.plan_context)
             # Captura as pendências remanescentes no grafo
             pending = self.pending.collect(graph)
 
-            if pending.resolved or pending.unchanged:
+            if pending.resolved and pending.unchanged:
                 return EngineResult(
                     completed=pending.resolved and pending.unchanged,
                     graph=graph
@@ -89,7 +97,7 @@ class SolvingModule:
         graph = session.graph
         for node in graph.nodes.values():
             format_type = node.component.file_format
-            registry = self.adapter_registry.get(format_type)
+            registry = self.plan_context.adapter_registry.get(format_type)
             
             if registry is None:
                 continue

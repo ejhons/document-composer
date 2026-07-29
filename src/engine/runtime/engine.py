@@ -41,7 +41,7 @@ class Engine:
         session = ExecutionSession(
             manifest = manifest,
             execution_context = context,
-            trace = None,
+            trace = [],
             workspace=workspace
         )
 

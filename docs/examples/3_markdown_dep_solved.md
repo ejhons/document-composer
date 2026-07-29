@@ -1,15 +1,11 @@
----
-fields_definition:
-  project_title:
-    data_type: "text"
-    label: "Nome do Empreendimento"
-  discipline:
-    data_type: "text"
-    label: "Disciplina de projeto"
----
-# MEMORIAL TÉCNICO DE ENGENHARIA
 
-## 1. Escopo Estrutural do Projeto:}
+# **Título do Projeto**
+
+@include('logo.png')
+
+## MEMORIAL TÉCNICO DE ENGENHARIA
+
+## 1. Escopo Estrutural do Projeto de **Estruturas**
 
 O cálculo de dimensionamento dos pilares de sustentação foi executado utilizando o critério de esbeltez e tensão admissível do material, conforme a formulação clássica:
 
@@ -26,3 +22,5 @@ graph TD
     C -- Sim --> D[Fundação Direta]
     C -- Não --> E[Estacas Profundas]
 ```
+
+@include(components/structural.docx)

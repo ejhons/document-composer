@@ -13,9 +13,9 @@ class DocxAdapter(BaseContentAdapter):
 
     def __init__(
         self,
-        parser: MarkdownParser
+        parser: MarkdownParser | None = None
     ):
-        self.parser = parser
+        self.parser = parser or MarkdownParser()
 
     def convert(
         self,
@@ -37,7 +37,7 @@ class DocxAdapter(BaseContentAdapter):
 
         placeholder = f'@include("{asset.id}")'
 
-        parsed = self.parser.parse(placeholder)
+        # parsed = self.parser.parse(placeholder)
 
         return ComponentContent(
             markdown=placeholder, #parsed,

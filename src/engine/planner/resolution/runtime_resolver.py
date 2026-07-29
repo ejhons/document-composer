@@ -28,6 +28,7 @@ class RuntimeResolver:
         graph: RecipeGraph,
         context: ExecutionContext
     ):
+        # print(type(graph))
         for node in graph.nodes.values():
             self.resolve_node(node, context)
 

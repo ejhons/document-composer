@@ -27,11 +27,11 @@ class EngineBuilder:
 
     def add_inspector(
         self,
-        extension: str,
+        format_name: str, #image, text, etc
         inspector
     ) -> "EngineBuilder":
         self.context.inspector_registry.register(
-            extension,
+            format_name,
             inspector
         )
         return self
@@ -74,6 +74,10 @@ class EngineBuilder:
 
     def use_runtime_resolver(self, resolver) -> "EngineBuilder":
         self.context.runtime_resolver = resolver
+        return self
+    
+    def use_dependency_resolver(self, resolver) -> "EngineBuilder":
+        self.context.dependency_resolver = resolver
         return self
 
     def build(self):
@@ -120,17 +124,17 @@ class EngineBuilder:
                 "image",
                 ImageMarkdownAdapter()
             )\
-            .add_compiler(
-                "docx",
-                DocxCompiler()
-            )\
-            .add_compiler(
-                "html",
-                HtmlCompiler()
-            )\
-            .add_compiler(
-                "pdf",
-                PdfCompiler()
-            )
+            # .add_compiler(
+            #     "docx",
+            #     DocxCompiler()
+            # )\
+            # .add_compiler(
+            #     "html",
+            #     HtmlCompiler()
+            # )\
+            # .add_compiler(
+            #     "pdf",
+            #     PdfCompiler()
+            # )
 
         return builder

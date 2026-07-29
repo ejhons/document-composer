@@ -35,8 +35,8 @@ class ResolutionState(BaseModel):
     @property
     def resolved(self):
         # print('content: ', self.content)
-        print('pending inputs: ', self.pending_inputs)
-        print('pending_dependencies: ', self.pending_dependencies)
+        # print('pending inputs: ', self.pending_inputs)
+        # print('pending_dependencies: ', self.pending_dependencies)
         return (
             not self.pending_inputs and
             not self.pending_dependencies

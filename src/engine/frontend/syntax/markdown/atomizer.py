@@ -32,7 +32,7 @@ class MarkdownAtomizer:
         for directive in directives:
             directive.arguments
             start = directive.start.index
-            end = directive.end.index
+            end = directive.end.index + 1
 
             # Texto anterior
             if start > cursor:

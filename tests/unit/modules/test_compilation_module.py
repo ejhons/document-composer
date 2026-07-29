@@ -3,8 +3,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from engine.compilation.module import CompilationModule
-from engine.execution.execution_session import ExecutionSession
+from engine.modules.compilation import CompilationModule
+from engine.runtime.execution.session import ExecutionSession
 
 @pytest.fixture
 def compiler():

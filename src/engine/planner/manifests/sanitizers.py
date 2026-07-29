@@ -1,9 +1,11 @@
 import datetime
 import logging
 from typing import Any
+from warnings import deprecated
 
 logger = logging.getLogger("doc_engine.sanitizers")
 
+@deprecated('Unused')
 class Sanitizers:
     """Collection of data formatting filters for professional document outputs."""
 

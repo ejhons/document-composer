@@ -1,3 +1,4 @@
+import os
 import re
 import base64
 import logging
@@ -5,6 +6,7 @@ import requests
 
 from typing import Any
 from pathlib import Path
+from engine.common.cache import CacheManager, StaticCacheManager
 from engine.frontend.parser import MarkdownParser
 from engine.common.models.workspace import Workspace
 from engine.common.exceptions import DownloadException
@@ -21,13 +23,13 @@ class MarkdownAdapter(BaseContentAdapter):
     and resolving embedded dynamic sub-blocks like inline Mermaid diagrams.
     """
     def __init__(
-            self,
-            parser: MarkdownParser,
-            cache_manager: Any,
-            mermaid_adapter: MermaidMarkdownAdapter | None = None
-            ):
-        self.parser = parser
-        self.cache = cache_manager
+        self,
+        parser: MarkdownParser | None = None,
+        cache_manager: StaticCacheManager | None = None,
+        mermaid_adapter: MermaidMarkdownAdapter | None = None
+    ):
+        self.parser = parser or MarkdownParser()
+        self.cache = cache_manager or StaticCacheManager()
         self.mermaid_adapter = mermaid_adapter or MermaidMarkdownAdapter(cache_manager=self.cache, parser=parser)
 
     def convert(
@@ -66,10 +68,10 @@ class MermaidMarkdownAdapter(BaseContentAdapter):
     def __init__(
         self,
         parser: MarkdownParser,
-        cache_manager: Any
+        cache_manager: StaticCacheManager | None = None,
     ):
         self.parser = parser
-        self.cache = cache_manager
+        self.cache = cache_manager or StaticCacheManager()
 
     def convert(
         self, 
@@ -95,7 +97,7 @@ class MermaidMarkdownAdapter(BaseContentAdapter):
         for block in matches:
             # Cria o asset do da imagem gerada pela renderização.
             asset = self._render(
-                diagram_code=block, 
+                diagram_code=block.group(1), 
                 output_dir=workspace.images_dir
             )
             # Parte para próxima iteração caso não seja criada uma imagem
@@ -104,7 +106,7 @@ class MermaidMarkdownAdapter(BaseContentAdapter):
             # Adiciona os assets gerados ao bundle
             assets.add(asset)
             processed = processed.replace(
-                block.full_text,
+                block.group(0),
                 f'![Diagram]({asset.output.as_posix()})'
             )
 
@@ -120,7 +122,7 @@ class MermaidMarkdownAdapter(BaseContentAdapter):
     ) -> list[Any]:
         """Scans rendered text for inline mermaid code blocks and translates them into static images."""
         mermaid_pattern = r'```mermaid\s*\n(.*?)\n```'
-        matches = re.findall(
+        matches = re.finditer(#findall(
             mermaid_pattern,
             raw_markdown,
             re.DOTALL
@@ -143,15 +145,10 @@ class MermaidMarkdownAdapter(BaseContentAdapter):
         # output_image = os.path.join(output_dir, image_filename)
         # output_image_path = Path(output_image)
         
-        asset = Asset(
-            id = diagram_id,
-            type = 'image',
-            source= output_image_path,#source or output_image_path,
-            output= output_image_path,
-        )
-
+        asset = None
+        
         # Verificação de cache nativa
-        if self.cache.is_cached(diagram_id, diagram_hash, [output_image_path]):
+        if self.cache.is_cached(diagram_id, diagram_hash):#, [output_image_path]):
             logger.info(f"Cache hit for inline diagram '{diagram_id}'. Reusing PNG asset.")
         else:
             logger.info(f"Cache miss for inline diagram '{diagram_id}'. Fetching cloud render...")
@@ -160,13 +157,26 @@ class MermaidMarkdownAdapter(BaseContentAdapter):
                 base64_bytes = base64.b64encode(graph_bytes)
                 base64_string = base64_bytes.decode('utf-8')
                 
-                url = f"[https://mermaid.ink/img/](https://mermaid.ink/img/){base64_string}"
+                url = f"https://mermaid.ink/img/{base64_string}"
+                processed = f"[https://mermaid.ink/img/](https://mermaid.ink/img/{base64_string})"
                 response = requests.get(url, timeout=15)
                 
                 if response.status_code == 200:
+                    # Ensure the directory exists
+                    os.makedirs(os.path.dirname(output_image_path), exist_ok=True)
+                    
                     with open(output_image_path, 'wb') as f:
                         f.write(response.content)
                     self.cache.update_cache(diagram_id, diagram_hash, [output_image_path])
+                    logger.info(f"Image Output path: '{output_image_path}'. ")
+
+                    asset = Asset(
+                        id = diagram_id,
+                        type = 'image',
+                        source= output_image_path,#source or output_image_path,
+                        output= output_image_path,
+                    )
+                                    
                 else:
                     raise DownloadException("Couldn't using mermaid.ink API")
             except Exception as e:

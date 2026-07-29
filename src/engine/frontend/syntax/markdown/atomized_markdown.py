@@ -1,5 +1,6 @@
 import re
 from typing import Any, Dict, Optional, Tuple
+from numpy import block
 from pydantic import Field
 from pydantic import BaseModel
 from engine.frontend.parser import MarkdownParser
@@ -13,6 +14,16 @@ from engine.frontend.syntax.inputs import InputReference
 class AtomizedMarkdown(BaseModel):
     body: Optional[str] = None
     blocks: list[MarkdownAtom] = Field(default_factory=list)
+
+    @property
+    def assembled_content(self):
+        '''
+        Markdown completo a partir dos fragmentos.
+        '''
+        return [
+            block.to_markdown()
+            for block  in self.blocks
+        ]
 
 
 

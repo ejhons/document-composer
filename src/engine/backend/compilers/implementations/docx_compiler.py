@@ -2,12 +2,13 @@ import os
 import pypandoc
 from engine.common.models.recipe import RecipeManifest
 from engine.backend.compilers.base import BaseCompiler
+from engine.frontend.syntax.markdown.atomized_markdown import AtomizedMarkdown
 
 
 class DocxCompiler(BaseCompiler):
     def compile(
             self, 
-            source_markdown_path: str,
+            assembled_markdown: AtomizedMarkdown,
             output_path: str, 
             manifest: RecipeManifest,
             **kwargs

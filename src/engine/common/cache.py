@@ -5,6 +5,59 @@ import logging
 
 logger = logging.getLogger("doc_engine.cache")
 
+
+class StaticCacheManager:
+    """
+    Manages asset serialization states using SHA256 hashing to prevent 
+    unnecessary re-compilation of heavy external assets.
+    """
+    def __init__(self, registry:dict = {}):
+        self.registry = registry
+    
+    @staticmethod
+    def calculate_text_hash(text: str) -> str:
+        """Generates a unique SHA256 checksum string for raw text strings (e.g., Mermaid blocks)."""
+        return hashlib.sha256(text.encode('utf-8')).hexdigest()
+
+    def is_cached(
+        self,
+        asset_id: str,
+        current_hash: str,
+        # expected_outputs: list
+    ) -> bool:
+        """
+        Verifies if the asset match recorded hash credentials and checks 
+        if all expected physical file outputs actually exist on disk.
+        """
+        cached_entry = self.registry.get(asset_id)
+        if not cached_entry:
+            return False
+        
+        # Check if hash values match perfectly
+        if cached_entry.get("hash") != current_hash:
+            return False
+            
+        # Check if files generated in previous run were not deleted
+        # for file_path in expected_outputs:
+        #     if not os.path.exists(file_path):
+        #         return False
+                
+        return True
+
+    def update_cache(
+        self,
+        asset_id: str,
+        current_hash: str,
+        outputs: list
+    ):
+        """Records a new finalized compilation asset fingerprint entry to registry cache."""
+        self.registry[asset_id] = {
+            "hash": current_hash,
+            "outputs": outputs
+        }
+        # self._save_registry()
+
+
 class CacheManager:
     """
     Manages asset serialization states using SHA256 hashing to prevent 

@@ -4,6 +4,8 @@ from engine.frontend.parser import MarkdownParser
 from engine.planner.graph.component_node import ComponentNode
 from engine.planner.graph.graph import RecipeGraph
 from engine.planner.planning_context import PlanningContext
+# from engine.planner.planning_context import PlanningContext
+# from engine.runtime.context import EngineContext
 
 class DependencyResolver:
     '''
@@ -28,7 +30,7 @@ class DependencyResolver:
     def resolve(
             self,
             graph: RecipeGraph,
-            context: PlanningContext
+            context:PlanningContext
         ):
         visited: set[str] = set()
         queue: list[ComponentNode] = list(graph.nodes.values())
@@ -63,7 +65,7 @@ class DependencyResolver:
             self,
             node: ComponentNode,
             graph: RecipeGraph,
-            context: PlanningContext
+            context:PlanningContext
         ) -> list[ComponentNode]:
 
         resolution = node.resolution

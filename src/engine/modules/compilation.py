@@ -8,7 +8,6 @@ class CompilationModule:
     def __init__(
         self,
         context: EngineContext
-        # compiler_registry: CompilerRegistry
     ):
         self.compilers = context.compiler_registry
 

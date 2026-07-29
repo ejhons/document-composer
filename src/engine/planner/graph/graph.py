@@ -9,6 +9,11 @@ class RecipeGraph(BaseModel):
     _source_index: dict[str, str]  = PrivateAttr(default_factory=dict)
     # _dependents_cache: dict[str, str]  = PrivateAttr(default_factory=dict)
 
+    
+    def get_node(self, node_id: str) -> ComponentNode:
+        return self.nodes.get(node_id)
+
+    
     def add_node(self, node: ComponentNode):
         '''
         O ComponentConfig em ComponentNode deve ter seu source normalizado.

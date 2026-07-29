@@ -22,9 +22,11 @@ class PlanningModule:
         '''
         Creates graph, neccessary for planning operations.
         '''
-        graph = RecipeGraphBuilder().build(
-            manifest=session.manifest,
+        graph = RecipeGraphBuilder(
             resource_resolver=self.resource_resolver
+        ).build(
+            manifest=session.manifest,
+            # resource_resolver=self.resource_resolver
         )
         # Creates graph
         session.graph = graph

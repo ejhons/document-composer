@@ -15,3 +15,6 @@ class DownloadException(BaseDocException):
 
 class GraphNotSolvedException(BaseDocException):
     pass
+
+class ContentNotAvaliable(BaseDocException):
+    pass

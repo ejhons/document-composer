@@ -12,23 +12,48 @@ class BaseCompiler(ABC):
     """
     def __init__(
             self,
-            registry: Optional[Any] = None
+            registry: Optional[Any] = None,
+            # renderer_registry: RendererRegistry
         ):
         # Recebe a injeção do registro de adaptadores se necessário
         self.registry = registry
+        # self.renderer_registry = renderer_registry
+
+    @abstractmethod
+    def create_document(self):
+        ...
+
+    @abstractmethod
+    def save_document(
+        self,
+        document,
+        output_path: str
+    ):
+        ...
 
     @abstractmethod
     def compile(
         self,
-        fragmented_markdown: AtomizedMarkdown,
+        atomized: AtomizedMarkdown,
         session,
         output_path: str,
-        # source_markdown_path: str,
-        # manifest: RecipeManifest,
         **kwargs
     ) -> str:
         """Translates the compiled Markdown into the target binary format layout."""
-        pass
+        document = self.create_document()
+
+        for atom in atomized.blocks:
+            renderer = self.renderer_registry.resolve(atom)
+
+            renderer.render(
+                atom=atom,
+                document=document,
+                session=session,
+            )
+
+        self.save_document(document, output_path)
+
+        return output_path
 
     # @abstractmethod
     # def compile(

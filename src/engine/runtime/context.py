@@ -1,10 +1,12 @@
 from dataclasses import dataclass, field
+from email.policy import default
 
 from engine.backend.adapters.registry import AdapterRegistry
 from engine.backend.compilers.registry import CompilerRegistry
 from engine.frontend.directives.registry import DirectiveRegistry
 from engine.frontend.inspection_pipeline import InspectionPipeline
 from engine.frontend.inspectors.registry import StaticInspectorRegistry
+from engine.frontend.parser import MarkdownParser
 from engine.frontend.syntax.markdown.atomizer import MarkdownAtomizer
 from engine.planner.resolution.dependency_resolver import DependencyResolver
 from engine.planner.resolution.resolution_collector import PendingCollector
@@ -15,6 +17,7 @@ from engine.planner.resources.resource_resolver import LocalResourceResolver
 @dataclass
 class EngineContext:
     resource_resolver: ResourceResolver 
+    markdown_parser: MarkdownParser = field(default_factory = MarkdownParser)
 
     inspector_registry: StaticInspectorRegistry = field(default_factory=StaticInspectorRegistry)
     directive_registry: DirectiveRegistry = field(default_factory=DirectiveRegistry)

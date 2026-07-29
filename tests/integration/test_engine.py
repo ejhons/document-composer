@@ -1,89 +1,15 @@
-import pytest
+import os
 
-from engine.frontend.inspection_pipeline import InspectionPipeline
-from engine.planner.recipe_builder import RecipeGraphBuilder
+from engine.runtime.builder import EngineBuilder
 from engine.runtime.execution.context import ExecutionContext
-from engine.runtime.engine import Engine
 
-
-# def test_engine_resolves_runtime_and_dependencies(engine):
-#     graph = engine.plan(
-#         component=NodeComponent.from_file("tests/resources/main.md"),
-#         inputs={
-#             "name": "Everton",
-#             "type": "person"
-#         }
-#     )
-
-#     assert len(graph.nodes) == 2
-
-#     main = graph.root
-#     dependency = graph.find_by_path(
-#         "contracts/person.md"
-#     )
-
-#     assert dependency is not None
-
-#     assert main.resolution.content == (
-#         "Olá Everton\n\n"
-#         '@include("contracts/person.md")'
-#     )
-
-#     assert not main.resolution.pending_inputs
-#     assert not main.resolution.pending_dependencies
-
-#     assert main.resolution.resolved
-
-#     assert dependency.resolution.resolved
-
-# def test_engine_keeps_unresolved_directive(engine):
-#     graph = engine.plan(
-#         component=Component.from_file("tests/resources/main.md"),
-#         inputs={
-#             "name": "Everton"
-#         }
-#     )
-
-#     root = graph.root
-
-#     assert root.resolution.content == (
-#         "Olá Everton\n\n"
-#         '@include("contracts/{{ type }}.md")'
-#     )
-
-#     assert root.resolution.pending_inputs == {
-#         "type"
-#     }
-
-#     assert len(graph.nodes) == 1
-
-# def test_engine_converges_after_new_input(engine):
-#     graph = engine.plan(
-#         component=Component.from_file("tests/resources/main.md"),
-#         inputs={
-#             "name": "Everton"
-#         }
-#     )
-
-#     graph = engine.resolve(
-#         graph,
-#         {
-#             "name": "Everton",
-#             "type": "person"
-#         }
-#     )
-
-#     assert len(graph.nodes) == 2
-
-#     assert graph.root.resolution.resolved
 
 def test_engine_converges_until_no_changes(
     full_engine,
     temp_workspace,
+    temp_workspace_object,
     markdown_file,
-    recipe_manifest,
-    planning_context,
-    scheduler
+    recipe_manifest
 ):
 
     markdown_file(
@@ -96,16 +22,14 @@ def test_engine_converges_until_no_changes(
 
     markdown_file(
         "memorial.md",
-        """
----
-fields_definition:
-project_title:
+        """---
+fields:
+  project_title:
     data_type: text
     label: Nome do Empreendimento
-discipline:
+  discipline:
     data_type: text
     label: Disciplina de projeto
-fields:
   flow:
     type: number
     label: Vazão
@@ -118,7 +42,7 @@ fields:
 
 O cálculo de dimensionamento dos pilares de sustentação, no empreendimento {{localization}}, foi executado utilizando o critério de esbeltez e tensão admissível do material, conforme a formulação clássica ({{ flow }}):
 
-$$ \sigma = \frac{P}{A} \pm \frac{M}{W} $$
+$$ \\sigma = \\frac{P}{A} \\pm \\frac{M}{W} $$
 
 Abaixo, apresentamos o diagrama lógico que descreve o fluxo de validação da infraestrutura da obra {{classe}}:
 ```mermaid
@@ -149,17 +73,18 @@ graph TD
         recipe_manifest.components[0].model_copy(
             update={
                 "id": "memorial",
-                "source": (
-                    temp_workspace / "memorial.md"
-                ).as_posix()
+                "source": (temp_workspace / "memorial.md").as_posix()
             }
         )
     )
 
     execution_context = ExecutionContext(
         inputs= {
+            'client':'Everton',
             'logo':'generic',
+            'classe':'de Infraestrutura',
             'project_title': 'Generic project',
+            'discipline':'Structure',
             'localization': 'HERE',
             'flow': 35.0,
         }
@@ -173,23 +98,80 @@ graph TD
     #     graph=graph,
     #     planning_context=full_engine.plan_context
     # )
+    img_path = temp_workspace_object.root.joinpath('image_generic.png')
+    os.makedirs(os.path.dirname(img_path), exist_ok=True)
+
+
+    with open(img_path, 'wb') as f:
+        f.write(b'ff')
 
     session = full_engine.create_session(
         manifest=recipe_manifest,
-        context=execution_context
+        context=execution_context,
+        workspace=temp_workspace_object
     )
-    full_engine.build_graph(
-        session
-    )
-    full_engine.resolve(
-        session
-    )
+    engine = EngineBuilder.default().build()
+    engine.planning.execute(session)
+    engine.solving.execute(session)
 
-    full_engine.plan(
-        session,
-        scheduler
-    )
-    #     graph,
-    #     execution_context
-    # )
     assert session.graph
+    assert len(session.graph.nodes) == 4
+    for node in session.graph.nodes.values():
+        assert node.adapted.markdown
+
+
+
+# def test_engine_resolves_runtime_and_dependencies(engine):
+#     graph = engine.plan(
+#         component=NodeComponent.from_file("tests/resources/main.md"),
+#         inputs={
+#             "name": "Everton",
+#             "type": "person"
+#         }
+#     )
+#     assert len(graph.nodes) == 2
+#     main = graph.root
+#     dependency = graph.find_by_path(
+#         "contracts/person.md"
+#     )
+#     assert dependency is not None
+#     assert main.resolution.content == (
+#         "Olá Everton\n\n"
+#         '@include("contracts/person.md")'
+#     )
+#     assert not main.resolution.pending_inputs
+#     assert not main.resolution.pending_dependencies
+#     assert main.resolution.resolved
+#     assert dependency.resolution.resolved
+# def test_engine_keeps_unresolved_directive(engine):
+#     graph = engine.plan(
+#         component=Component.from_file("tests/resources/main.md"),
+#         inputs={
+#             "name": "Everton"
+#         }
+#     )
+#     root = graph.root
+#     assert root.resolution.content == (
+#         "Olá Everton\n\n"
+#         '@include("contracts/{{ type }}.md")'
+#     )
+#     assert root.resolution.pending_inputs == {
+#         "type"
+#     }
+#     assert len(graph.nodes) == 1
+# def test_engine_converges_after_new_input(engine):
+#     graph = engine.plan(
+#         component=Component.from_file("tests/resources/main.md"),
+#         inputs={
+#             "name": "Everton"
+#         }
+#     )
+#     graph = engine.resolve(
+#         graph,
+#         {
+#             "name": "Everton",
+#             "type": "person"
+#         }
+#     )
+#     assert len(graph.nodes) == 2
+#     assert graph.root.resolution.resolved

@@ -1,3 +1,5 @@
+from warnings import deprecated
+
 from engine.backend.ir.block import ComponentIRBlock
 from engine.backend.ir.document import DocumentIR
 from engine.frontend.parser import MarkdownParser
@@ -5,6 +7,7 @@ from engine.frontend.syntax.parsed_markdown import ParsedMarkdown
 from engine.planner.graph.graph import RecipeGraph
 
 
+@deprecated('Unused')
 class MarkdownAssembler:
     def assemble(
         self,
@@ -29,6 +32,7 @@ class MarkdownAssembler:
         return parser.parse(content="\n\n".join(chunks))
     
 
+@deprecated('Unused')
 class MarkdownAssembler:
 
     def assemble(
@@ -73,6 +77,7 @@ class MarkdownAssembler:
             )
 
 
+@deprecated('Unused')
 class MarkdownRenderer:
 
     def render(

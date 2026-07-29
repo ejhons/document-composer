@@ -103,3 +103,5 @@ Fim
 
     # parsed = MarkdownParser().parse(cover.adapted.body)
     # assert parsed.variables == []
+
+
