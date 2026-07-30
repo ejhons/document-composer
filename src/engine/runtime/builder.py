@@ -1,20 +1,24 @@
 from engine.runtime.engine import Engine
+from engine.runtime.context import EngineContext
+
 from engine.modules.planning import PlanningModule
 from engine.modules.solving import SolvingModule
 from engine.modules.assembling import AssemblingModule
 from engine.modules.compilation import CompilationModule
-from engine.runtime.context import EngineContext
-from engine.backend.adapters.implementations.docx_adapter import DocxAdapter
-from engine.backend.adapters.implementations.excel_adapter import ExcelToMarkdownAdapter
-from engine.backend.adapters.implementations.image_adapter import ImageMarkdownAdapter
-from engine.backend.adapters.implementations.md_adapter import MarkdownAdapter
-from engine.backend.adapters.implementations.pdf_adapter import PdfToImageMarkdownAdapter
-from engine.backend.compilers.implementations.docx_compiler import DocxCompiler
-from engine.backend.compilers.implementations.html_compiler import HtmlCompiler
-from engine.backend.compilers.implementations.pdf_compiler import PdfCompiler
+
+from engine.compilation.adapters.implementations.md_adapter import MarkdownAdapter
+from engine.compilation.adapters.implementations.docx_adapter import DocxAdapter
+from engine.compilation.adapters.implementations.excel_adapter import ExcelToMarkdownAdapter
+from engine.compilation.adapters.implementations.image_adapter import ImageMarkdownAdapter
+from engine.compilation.adapters.implementations.pdf_adapter import PdfToImageMarkdownAdapter
+
+from engine.compilation.compilers.implementations.docx_compiler import DocxCompiler
+from engine.compilation.compilers.implementations.html_compiler import HtmlCompiler
+from engine.compilation.compilers.implementations.pdf_compiler import PdfCompiler
+
+from engine.planning.loaders.resource_resolver import LocalResourceResolver
+from engine.solving.inspection.implementations.markdown_inspector import MarkdownInspector
 from engine.frontend.directives.implementations.include_directive import IncludeDirectiveHandler
-from engine.frontend.inspectors.implementations.inspector import MarkdownInspector
-from engine.planner.resources.resource_resolver import LocalResourceResolver
 
 
 class EngineBuilder:
@@ -124,17 +128,17 @@ class EngineBuilder:
                 "image",
                 ImageMarkdownAdapter()
             )\
-            # .add_compiler(
-            #     "docx",
-            #     DocxCompiler()
-            # )\
-            # .add_compiler(
-            #     "html",
-            #     HtmlCompiler()
-            # )\
-            # .add_compiler(
-            #     "pdf",
-            #     PdfCompiler()
-            # )
+            .add_compiler(
+                "html",
+                HtmlCompiler(registry=builder.context.compiler_registry)
+            )\
+            .add_compiler(
+                "pdf",
+                PdfCompiler(registry=builder.context.compiler_registry)
+            )\
+            .add_compiler(
+                "docx",
+                DocxCompiler(registry=builder.context.compiler_registry)
+            )
 
         return builder

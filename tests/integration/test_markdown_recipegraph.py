@@ -1,9 +1,9 @@
-from engine.frontend.inspection_pipeline import InspectionPipeline
-from engine.frontend.inspectors.implementations.inspector import MarkdownInspector
-from engine.planner.resolution.resolution_state import ResolutionState
-from engine.planner.resolution.runtime_resolver import RuntimeResolver
-from engine.planner.recipe_builder import RecipeGraphBuilder
-from engine.planner.resolution.dependency_resolver import DependencyResolver
+from engine.solving.inspection.pipeline import InspectionPipeline
+from engine.solving.inspection.implementations.markdown_inspector import MarkdownInspector
+from engine.solving.resolution.resolution_state import ResolutionState
+from engine.solving.resolution.runtime_resolver import RuntimeResolver
+from engine.planning.graph.builder import RecipeGraphBuilder
+from engine.solving.resolution.dependency_resolver import DependencyResolver
 from engine.runtime.execution.context import ExecutionContext
 from engine.frontend.directives.implementations.include_directive import IncludeDirectiveHandler
 

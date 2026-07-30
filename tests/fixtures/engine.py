@@ -2,15 +2,15 @@
 import pytest
 
 from build.lib.engine.execution.engine import Engine
-from engine.backend.compilers.registry import CompilerRegistry
-from engine.frontend.inspection_pipeline import InspectionPipeline
-from engine.planner.resolution.resolution_collector import PendingCollector
-from engine.planner.resolution.dependency_resolver import DependencyResolver
-from engine.planner.resolution.runtime_resolver import RuntimeResolver
-from engine.planner.graph.topology import Topology
-from engine.planner.planning_context import PlanningContext
+from engine.compilation.compilers.registry import CompilerRegistry
+from engine.solving.inspection.pipeline import InspectionPipeline
+from engine.solving.resolution.resolution_collector import PendingCollector
+from engine.solving.resolution.dependency_resolver import DependencyResolver
+from engine.solving.resolution.runtime_resolver import RuntimeResolver
+from engine.planning.graph.topology import Topology
+from engine.solving.solving_context import SolvingContext
 from engine.runtime.builder import EngineBuilder
-from engine.runtime.scheduler import Scheduler
+from engine.backup.scheduler import Scheduler
 
 
 @pytest.fixture

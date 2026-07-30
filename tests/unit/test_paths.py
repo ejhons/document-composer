@@ -1,4 +1,4 @@
-from engine.common.models.recipe import ComponentConfig
+from engine.frontend.manifests.recipe import ComponentConfig
 
 
 

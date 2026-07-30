@@ -8,7 +8,7 @@ from engine.common.exceptions import (
     ResolutionException,
 )
 from engine.modules.solving import SolvingModule
-from engine.planner.resources.resource_resolver import LocalResourceResolver
+from engine.planning.loaders.resource_resolver import LocalResourceResolver
 from engine.runtime.builder import EngineBuilder
 from engine.runtime.context import EngineContext
 

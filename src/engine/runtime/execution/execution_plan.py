@@ -1,8 +1,11 @@
 from typing import Any
+from warnings import deprecated
 from pydantic import BaseModel, Field
-from engine.planner.graph.component_node import ComponentNode
+from engine.planning.graph.component_node import ComponentNode
 
 
+
+@deprecated('Unused')
 class ExecutionPlan(BaseModel):
     steps: list[ExecutionStep]
 
@@ -10,6 +13,8 @@ class ExecutionPlan(BaseModel):
         for step in self.steps:
             step.executed = False
 
+
+@deprecated('Unused')
 class ExecutionStep(BaseModel):
     node: ComponentNode
     order: int

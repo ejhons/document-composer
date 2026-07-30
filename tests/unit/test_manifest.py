@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from engine.common.models.recipe import ComponentConfig, RecipeManifest, StyleConfig
+from engine.frontend.manifests.recipe import ComponentConfig, RecipeManifest, StyleConfig
 
 
 # Inferência de DOCX

@@ -1,5 +1,5 @@
 from unittest.mock import Mock, patch
-from engine.common.models.recipe import RecipeManifest, StyleConfig
+from engine.frontend.manifests.recipe import RecipeManifest, StyleConfig
 from engine.modules.planning import PlanningModule
 from engine.runtime.execution.context import ExecutionContext
 from engine.runtime.execution.session import ExecutionSession

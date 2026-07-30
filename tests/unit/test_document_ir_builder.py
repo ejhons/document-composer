@@ -1,8 +1,8 @@
 import pytest
 
-from engine.backend.ir.builder import DocumentIRBuilder
-from engine.planner.graph.component_node import Dependency
-from engine.planner.graph.graph import RecipeGraph
+from engine.compilation.ir.builder import DocumentIRBuilder
+from engine.planning.graph.component_node import Dependency
+from engine.planning.graph.graph import RecipeGraph
 
 
 def test_build_empty_document():

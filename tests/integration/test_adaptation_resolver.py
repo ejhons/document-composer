@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from engine.backend.adapters.base import BaseContentAdapter
-from engine.common.models.assets import AssetBundle, ComponentContent
-from engine.planner.recipe_builder import RecipeGraphBuilder
-from engine.planner.resolution.adaptation_resolver import AdaptationResolver
+from engine.compilation.adapters.base import BaseContentAdapter
+from engine.planning.graph.assets import AssetBundle, ComponentContent
+from engine.planning.graph.builder import RecipeGraphBuilder
+from engine.solving.resolution.adaptation_resolver import AdaptationResolver
 from engine.runtime.execution.context import ExecutionContext
 from engine.runtime.execution.session import ExecutionSession
 

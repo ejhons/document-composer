@@ -1,5 +1,5 @@
 import pytest
-from engine.common.models.recipe import ComponentConfig, RecipeManifest, StyleConfig
+from engine.frontend.manifests.recipe import ComponentConfig, RecipeManifest, StyleConfig
 
 
 @pytest.fixture
@@ -8,7 +8,7 @@ def recipe_manifest():
         recipe_name="Teste",
         version="1.0",
         style=StyleConfig(),
-        target_format="docx",
+        target_format="html",
         components=[
             ComponentConfig(
                 type="template",

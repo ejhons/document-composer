@@ -2,7 +2,7 @@ import pytest
 
 from engine.frontend.directives.implementations.include_directive import IncludeDirectiveHandler
 from engine.frontend.directives.registry import DirectiveRegistry
-from engine.common.models.directives import DirectiveResolutionResult
+from engine.frontend.directives.result import DirectiveResolutionResult
 
 
 class FakeMarkdownInspector:

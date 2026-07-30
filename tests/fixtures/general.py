@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 import pytest
 from engine.frontend.syntax.fields import InputDefinition
-from engine.planner.resources.resource_resolver import LocalResourceResolver
+from engine.planning.loaders.resource_resolver import LocalResourceResolver
 
 
 

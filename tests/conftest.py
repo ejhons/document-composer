@@ -2,19 +2,19 @@
 from pathlib import Path
 
 from build.lib.engine.execution.engine import Engine
-from engine.backend.adapters.registry import AdapterRegistry
-from engine.backend.compilers.registry import CompilerRegistry
-from engine.common.models.workspace import Workspace
+from engine.compilation.adapters.registry import AdapterRegistry
+from engine.compilation.compilers.registry import CompilerRegistry
+from engine.runtime.workspace import Workspace
 from engine.frontend.directives.registry import DirectiveRegistry
-from engine.frontend.inspection_pipeline import InspectionPipeline
-from engine.frontend.inspectors.registry import StaticInspectorRegistry
+from engine.solving.inspection.pipeline import InspectionPipeline
+from engine.solving.inspection.registry import StaticInspectorRegistry
 from engine.frontend.parser import MarkdownParser
 from engine.frontend.syntax.expressions.parser import ExpressionParser
-from engine.planner.planning_context import PlanningContext
-from engine.planner.resolution.dependency_resolver import DependencyResolver
-from engine.planner.resolution.resolution_collector import PendingCollector
-from engine.planner.resolution.runtime_resolver import RuntimeResolver
-from engine.planner.resources.resource_resolver import LocalResourceResolver
+from engine.solving.solving_context import SolvingContext
+from engine.solving.resolution.dependency_resolver import DependencyResolver
+from engine.solving.resolution.resolution_collector import PendingCollector
+from engine.solving.resolution.runtime_resolver import RuntimeResolver
+from engine.planning.loaders.resource_resolver import LocalResourceResolver
 from engine.runtime.context import EngineContext
 
 # Encontra todos os arquivos .py dentro de tests/fixtures/ (ignorando __init__.py)
@@ -66,7 +66,7 @@ def markdown_file(temp_workspace: Path):
 def engine():
     engine = Engine(
         inspection_pipeline=InspectionPipeline(),
-        plan_context=PlanningContext(
+        plan_context=SolvingContext(
             resource_resolver = LocalResourceResolver(),
             directive_registry=DirectiveRegistry(),
             inspector_registry=StaticInspectorRegistry()

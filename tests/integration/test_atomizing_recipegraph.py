@@ -1,10 +1,10 @@
-from engine.common.models.assets import ComponentContent
-from engine.planner.recipe_builder import RecipeGraphBuilder
-from engine.frontend.inspection_pipeline import InspectionPipeline
+from engine.planning.graph.assets import ComponentContent
+from engine.planning.graph.builder import RecipeGraphBuilder
+from engine.solving.inspection.pipeline import InspectionPipeline
 from engine.frontend.syntax.markdown.atomizer import MarkdownAtomizer
-from engine.planner.resolution.resolution_state import ResolutionState
-from engine.planner.resolution.dependency_resolver import DependencyResolver
-from engine.frontend.inspectors.implementations.inspector import MarkdownInspector
+from engine.solving.resolution.resolution_state import ResolutionState
+from engine.solving.resolution.dependency_resolver import DependencyResolver
+from engine.solving.inspection.implementations.markdown_inspector import MarkdownInspector
 from engine.frontend.syntax.markdown.atom import MarkdownDirective, MarkdownFragment
 from engine.frontend.directives.implementations.include_directive import IncludeDirectiveHandler
 

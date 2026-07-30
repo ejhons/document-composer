@@ -1,18 +1,18 @@
 from dataclasses import dataclass, field
 from email.policy import default
 
-from engine.backend.adapters.registry import AdapterRegistry
-from engine.backend.compilers.registry import CompilerRegistry
+from engine.compilation.adapters.registry import AdapterRegistry
+from engine.compilation.compilers.registry import CompilerRegistry
 from engine.frontend.directives.registry import DirectiveRegistry
-from engine.frontend.inspection_pipeline import InspectionPipeline
-from engine.frontend.inspectors.registry import StaticInspectorRegistry
+from engine.solving.inspection.pipeline import InspectionPipeline
+from engine.solving.inspection.registry import StaticInspectorRegistry
 from engine.frontend.parser import MarkdownParser
 from engine.frontend.syntax.markdown.atomizer import MarkdownAtomizer
-from engine.planner.resolution.dependency_resolver import DependencyResolver
-from engine.planner.resolution.resolution_collector import PendingCollector
-from engine.planner.resolution.runtime_resolver import RuntimeResolver
-from engine.planner.resources.base import ResourceResolver
-from engine.planner.resources.resource_resolver import LocalResourceResolver
+from engine.solving.resolution.dependency_resolver import DependencyResolver
+from engine.solving.resolution.resolution_collector import PendingCollector
+from engine.solving.resolution.runtime_resolver import RuntimeResolver
+from engine.planning.loaders.base import ResourceResolver
+from engine.planning.loaders.resource_resolver import LocalResourceResolver
 
 @dataclass
 class EngineContext:

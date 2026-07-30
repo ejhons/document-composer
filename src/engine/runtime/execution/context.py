@@ -3,7 +3,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from engine.common.models.inspection import Diagnostic
+from engine.solving.inspection.inspection_result import Diagnostic
 
 
 class ExecutionContext(BaseModel):

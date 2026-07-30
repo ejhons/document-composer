@@ -1,8 +1,8 @@
 import pytest
 
-from engine.backend.ir.builder import DocumentIRBuilder
-from engine.frontend.inspection_pipeline import InspectionPipeline
-from engine.planner.recipe_builder import RecipeGraphBuilder
+from engine.compilation.ir.builder import DocumentIRBuilder
+from engine.solving.inspection.pipeline import InspectionPipeline
+from engine.planning.graph.builder import RecipeGraphBuilder
 from engine.runtime.execution.context import ExecutionContext
 from engine.runtime.engine import Engine
 from engine.runtime.execution.session import ExecutionSession

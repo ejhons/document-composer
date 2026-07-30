@@ -1,9 +1,9 @@
 import pytest
 
-from engine.common.models.recipe import ComponentConfig
-from engine.planner.graph.component_node import ComponentNode
-from engine.planner.graph.graph import RecipeGraph
-from engine.planner.resolution.resolution_state import ResolutionState
+from engine.frontend.manifests.recipe import ComponentConfig
+from engine.planning.graph.component_node import ComponentNode
+from engine.planning.graph.graph import RecipeGraph
+from engine.solving.resolution.resolution_state import ResolutionState
 
 
 @pytest.fixture

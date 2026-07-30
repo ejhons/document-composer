@@ -5,7 +5,7 @@ from typing import Any
 
 from engine.common.exceptions import NodeNotFoundException
 from engine.common.exceptions import NodeAlreadyRegistered
-from engine.planner.graph.component_node import Dependency
+from engine.planning.graph.component_node import Dependency
 
 # Add Node
 def test_should_add_node(graph, node_a):

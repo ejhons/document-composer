@@ -4,7 +4,7 @@ import shutil
 import pytest
 import pandas as pd
 
-from engine.backend.compilers.implementations.docx_compiler import DocxCompiler
+from engine.compilation.compilers.implementations.docx_compiler import DocxCompiler
 from engine.runtime.engine import DocumentEngine
 
 # =====================================================================

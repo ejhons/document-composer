@@ -1,6 +1,6 @@
-from engine.common.models.recipe import ComponentConfig, RecipeManifest, StyleConfig
-from engine.planner.recipe_builder import RecipeGraphBuilder
-from engine.planner.resources.base import ResourceResolver
+from engine.frontend.manifests.recipe import ComponentConfig, RecipeManifest, StyleConfig
+from engine.planning.graph.builder import RecipeGraphBuilder
+from engine.planning.loaders.base import ResourceResolver
 
 
 def test_manifest_should_be_converted_to_graph():

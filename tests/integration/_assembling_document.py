@@ -1,12 +1,12 @@
 import pytest
 
-from engine.common.models.assets import ComponentContent
-from engine.common.models.recipe import ComponentConfig
+from engine.planning.graph.assets import ComponentContent
+from engine.frontend.manifests.recipe import ComponentConfig
 from engine.frontend.syntax.markdown.atomized_markdown import AtomizedMarkdown
 from engine.frontend.syntax.markdown.atomizer import MarkdownAtomizer
 from engine.modules.assembling import AssemblingModule
-from engine.planner.graph.component_node import ComponentNode, Dependency
-from engine.planner.resources.resource_resolver import LocalResourceResolver
+from engine.planning.graph.component_node import ComponentNode, Dependency
+from engine.planning.loaders.resource_resolver import LocalResourceResolver
 from engine.runtime.context import EngineContext
 from engine.runtime.execution.session import ExecutionSession
 

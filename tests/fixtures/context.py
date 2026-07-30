@@ -1,11 +1,11 @@
 import pytest
-from engine.backend.adapters.registry import AdapterRegistry
+from engine.compilation.adapters.registry import AdapterRegistry
 from engine.frontend.directives.implementations.include_directive import IncludeDirectiveHandler
 from engine.frontend.directives.registry import DirectiveRegistry
-from engine.frontend.inspectors.implementations.inspector import MarkdownInspector
-from engine.frontend.inspectors.registry import StaticInspectorRegistry
-from engine.planner.planning_context import PlanningContext
-from engine.planner.resources.resource_resolver import LocalResourceResolver
+from engine.solving.inspection.implementations.markdown_inspector import MarkdownInspector
+from engine.solving.inspection.registry import StaticInspectorRegistry
+from engine.solving.solving_context import SolvingContext
+from engine.planning.loaders.resource_resolver import LocalResourceResolver
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def planning_context():
         IncludeDirectiveHandler()
     )
 
-    return PlanningContext(
+    return SolvingContext(
         adapter_registry=adapter_registry,
         resource_resolver=resource_resolver,
         directive_registry=directive_registry,

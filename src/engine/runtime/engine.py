@@ -4,9 +4,9 @@ from xmlrpc.client import Boolean
 
 from engine.modules.solving import SolvingModule
 from engine.modules.planning import PlanningModule
-from engine.common.models.workspace import Workspace
+from engine.runtime.workspace import Workspace
 from engine.modules.assembling import AssemblingModule
-from engine.common.models.recipe import RecipeManifest
+from engine.frontend.manifests.recipe import RecipeManifest
 from engine.modules.compilation import CompilationModule
 from engine.runtime.execution.context import ExecutionContext
 from engine.runtime.execution.session import ExecutionSession
@@ -63,7 +63,7 @@ class Engine:
         output_path: str,
     ) -> CompilationResult:
         session = self.assembling.execute(session)
-        session = self.compilation.compile(session, output_path)
+        session = self.compilation.execute(session, output_path)
 
         return None
 

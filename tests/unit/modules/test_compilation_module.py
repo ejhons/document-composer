@@ -1,135 +1,192 @@
-from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
 
-from engine.modules.compilation import CompilationModule
-from engine.runtime.execution.session import ExecutionSession
+from engine.common.exceptions import GraphNotSolvedException
+from engine.execution.execution_session import ExecutionSession
+from engine.planning.graph.graph import RecipeGraph
+from engine.planning.graph.component_node import ComponentNode, Dependency
+from engine.frontend.manifests.recipe import ComponentConfig
+from engine.common.models.resolution import ResolutionState
+from engine.assembling.module import AssemblingModule
+
+from engine.assembling.fragmented_markdown import (
+    FragmentedMarkdown,
+    MarkdownFragment,
+    MarkdownDirective,
+    MarkdownPlaceholder,
+)
+from engine.parser.models import DirectiveCall, DirectivePosition
 
 @pytest.fixture
-def compiler():
+def atomizer():
     return Mock()
 
-
 @pytest.fixture
-def registry(compiler):
-    registry = Mock()
-    registry.get_compiler.return_value = compiler
-    return registry
+def module(atomizer):
+    return AssemblingModule(atomizer)
 
+def test_execute_should_raise_when_graph_not_solved(module):
 
-@pytest.fixture
-def module(registry):
-    return CompilationModule(registry)
+    graph = Mock(spec=RecipeGraph)
+    type(graph).solved = property(lambda _: False)
 
+    session = ExecutionSession(
+        graph=graph
+    )
 
-@pytest.fixture
-def session():
-    session = Mock(spec=ExecutionSession)
+    with pytest.raises(GraphNotSolvedException):
+        module.execute(session)
 
-    session.manifest.target_format = "docx"
-    session.fragmented_markdown = Mock()
+def test_execute_should_keep_plain_fragments(module, atomizer):
 
-    return session
+    component = ComponentConfig(
+        type="template",
+        source="cover.md"
+    )
 
+    node = ComponentNode(component=component)
+    node.resolution = ResolutionState(resolved=True)
+    node.adapted = Mock(markdown="# Cover")
 
-def test_compile_should_get_compiler(
+    graph = RecipeGraph()
+    graph.add_node(node)
+
+    fragmented = FragmentedMarkdown(
+        blocks=[
+            MarkdownFragment(
+                content="# Cover"
+            )
+        ]
+    )
+
+    atomizer.atomize.return_value = fragmented
+
+    session = ExecutionSession(
+        graph=graph
+    )
+
+    module.execute(session)
+
+    atomizer.atomize.assert_called_once_with("# Cover")
+
+    assert len(fragmented.blocks) == 1
+    assert isinstance(
+        fragmented.blocks[0],
+        MarkdownFragment,
+    )
+
+def test_execute_should_replace_directive_by_placeholder(
     module,
-    registry,
-    session,
-    tmp_path,
+    atomizer,
 ):
-    module.compile(
-        session=session,
-        output_path=tmp_path / "output.docx",
+
+    component1 = ComponentConfig(
+        type="template",
+        source="cover.md",
     )
 
-    registry.get_compiler.assert_called_once_with(
-        "docx"
+    component2 = ComponentConfig(
+        type="template",
+        source="annex.md",
+    )
+
+    parent = ComponentNode(component=component1)
+    child = ComponentNode(component=component2)
+
+    parent.resolution = ResolutionState(resolved=True)
+    child.resolution = ResolutionState(resolved=True)
+
+    parent.adapted = Mock(markdown="dummy")
+    child.adapted = Mock(markdown="# Annex")
+
+    graph = RecipeGraph()
+
+    graph.add_node(parent)
+    graph.add_node(child)
+
+    graph.add_dependency(
+        Dependency(
+            source_id=parent.id,
+            target_id=child.id,
+            origin="0",
+        )
+    )
+
+    directive = DirectiveCall(
+        directive="include",
+        expression='include("annex.md")',
+        index=0,
+        start=DirectivePosition(index=8),
+        end=DirectivePosition(index=30),
+    )
+
+    fragmented = FragmentedMarkdown(
+        blocks=[
+            MarkdownFragment(content="Antes"),
+            MarkdownDirective(directive=directive),
+            MarkdownFragment(content="Depois"),
+        ]
+    )
+
+    atomizer.atomize.side_effect = [
+        fragmented,
+        FragmentedMarkdown(
+            blocks=[
+                MarkdownFragment("# Annex")
+            ]
+        ),
+    ]
+
+    session = ExecutionSession(
+        graph=graph
+    )
+
+    module.execute(session)
+
+    assert isinstance(
+        fragmented.blocks[1],
+        MarkdownPlaceholder,
+    )
+
+    assert (
+        fragmented.blocks[1].node_id
+        == child.id
     )
 
 
-def test_compile_should_call_compiler(
+def test_execute_should_atomize_every_node(
     module,
-    compiler,
-    session,
-    tmp_path,
+    atomizer,
 ):
-    output = tmp_path / "document.docx"
 
-    module.compile(
-        session=session,
-        output_path=output,
-    )
+    graph = RecipeGraph()
 
-    compiler.compile.assert_called()
+    for i in range(3):
 
-
-def test_compile_should_forward_fragmented_document(
-    module,
-    compiler,
-    session,
-    tmp_path,
-):
-    output = tmp_path / "result.docx"
-
-    module.compile(
-        session=session,
-        output_path=output,
-    )
-
-    compiler.compile.assert_called_with(
-        fragmented=session.fragmented_markdown,
-        output_path=output,
-    )
-
-
-def test_compile_should_return_compiler_result(
-    module,
-    compiler,
-    session,
-    tmp_path,
-):
-    expected = Path("generated.docx")
-
-    compiler.compile.return_value = expected
-
-    result = module.compile(
-        session=session,
-        output_path=tmp_path / "result.docx",
-    )
-
-    assert result == expected
-
-
-def test_compile_should_propagate_exception(
-    module,
-    compiler,
-    session,
-    tmp_path,
-):
-    compiler.compile.side_effect = RuntimeError(
-        "Compilation failed"
-    )
-
-    with pytest.raises(RuntimeError):
-        module.compile(
-            session=session,
-            output_path=tmp_path / "out.docx",
+        component = ComponentConfig(
+            type="template",
+            source=f"{i}.md",
         )
 
-def compile(
-    self,
-    session: ExecutionSession,
-    output_path,
-):
-    compiler = self.compilers.get_compiler(
-        session.manifest.target_format
+        node = ComponentNode(component=component)
+
+        node.resolution = ResolutionState(
+            resolved=True
+        )
+
+        node.adapted = Mock(
+            markdown=f"Node {i}"
+        )
+
+        graph.add_node(node)
+
+    atomizer.atomize.return_value = FragmentedMarkdown()
+
+    session = ExecutionSession(
+        graph=graph
     )
 
-    return compiler.compile(
-        fragmented=session.fragmented_markdown,
-        output_path=output_path,
-    )
+    module.execute(session)
 
-
+    assert atomizer.atomize.call_count == 3

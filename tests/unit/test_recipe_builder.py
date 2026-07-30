@@ -2,10 +2,10 @@ import pytest
 from unittest.mock import MagicMock, Mock, call
 
 from engine.common.exceptions import GraphNotSolvedException
-from engine.common.models.recipe import ComponentConfig, RecipeManifest, StyleConfig
-from engine.planner.graph.graph import RecipeGraph, SolvedGraph
-from engine.planner.recipe_builder import RecipeGraphBuilder
-from engine.planner.resources.base import ResourceResolver
+from engine.frontend.manifests.recipe import ComponentConfig, RecipeManifest, StyleConfig
+from engine.planning.graph.graph import RecipeGraph, SolvedGraph
+from engine.planning.graph.builder import RecipeGraphBuilder
+from engine.planning.loaders.base import ResourceResolver
 
 def test_build_empty_manifest_returns_empty_graph():
     manifest = RecipeManifest(
