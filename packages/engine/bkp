@@ -1,0 +1,18 @@
+[project]
+name = "doc-composer-core"
+version = "0.1.0"
+description = "Compilation engine of Doc Composer."
+requires-python = ">=3.14"
+
+dependencies = [
+    "jinja2",
+    "pydantic",
+    "networkx",
+    "python-docx",
+    "pypandoc",
+    "markdown",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

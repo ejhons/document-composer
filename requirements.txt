@@ -8,7 +8,7 @@ pandas>=2.0.0         # Para converter Excel (.xlsx) em tabelas de forma simples
 openpyxl>=3.1.0       # Engine de leitura para o Pandas abrir arquivos Excel
 pypdf>=4.0.0          # Para a união final de relatórios com anexos em PDF
 pytest
-request>=2.31.0
+requests
 tabulate
 pypdfium2 
 pillow

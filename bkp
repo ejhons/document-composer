@@ -1,0 +1,14 @@
+[project]
+name = "doc-composer-workspace"
+version = "0.1.0"
+description = ""
+requires-python = ">=3.14"
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "packages/core",
+    "packages/backend",
+    "packages/desktop",
+    "packages/shared",
+]

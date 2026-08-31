@@ -1,16 +1,33 @@
 {
+    "python.analysis.extraPaths": [
+        "./packages/engine/src",
+        "./packages/backend/src",
+        "./packages/desktop/src",
+        "./packages/frontend/src",
+        "./packages/shared/src"
+    ],
     "python.testing.pytestArgs": [
-        "."
+        "--rootdir",
+        "${workspaceFolder}",
+        "-vv"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
+    "python-envs.defaultEnvManager": "ms-python.python:venv",
     "workbench.colorCustomizations": {
         // "editor.background": "#1e1e1e",
         // "activityBar.background": "#000000",
         // "terminal.foreground": "#ed0000",
         "titleBar.activeBackground": "#780202"
     },
-    "python.analysis.autoImportCompletions": true,
+    // "python.analysis.autoImportCompletions": false,
     "better-comments.multilineComments": true,
-    "better-comments.highlightPlainText": false
+    "better-comments.highlightPlainText": false,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        ".",
+        "-p",
+        "test*.py"
+    ]
 }

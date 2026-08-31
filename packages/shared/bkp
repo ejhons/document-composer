@@ -1,0 +1,9 @@
+[project]
+name = "doc-composer-shared"
+version = "0.1.0"
+
+dependencies = ["pydantic"]
+
+[build-system]
+requires = ["uv_build>=0.11.25,<0.12.0"]
+build-backend = "uv_build"

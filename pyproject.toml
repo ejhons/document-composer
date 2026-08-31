@@ -1,31 +1,27 @@
-[build-system]
-requires = ["setuptools>=61"]
-build-backend = "setuptools.build_meta"
-
 [project]
-name = "doc-composer"
+name = "document-composer"
 version = "0.1.0"
-description = "Document Composer"
-authors = [{ name = "Everton Jhons" }]
+description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.14"
+dependencies = [
+    "dcp-engine",
+    "dcp-api",
+    "dcp-shared",
+    "pydantic>=2.13.4",
+]
 
-# dependencies = ["synaptic-units @ file:///../synaptic-units"]
-[project.optional-dependencies]
-dev = ["pydantic", "pytest", "jinja2>=3.1.2", "pyyaml>=6.0"]
+[dependency-groups]
+dev = ["pytest>=9.1.1"]
 
-[tool.setuptools]
-package-dir = { "" = "src" }
+[tool.uv.workspace]
+members = [
+    "packages/engine",
+    "packages/api",
+    "packages/shared",
+]
 
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.ruff]
-line-length = 88
-
-[tool.mypy]
-python_version = "3.10"
-strict = true
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
+[tool.uv.sources]
+dcp-engine = { workspace = true }
+dcp-shared = { workspace = true }
+dcp-api = { workspace = true }

@@ -1,0 +1,29 @@
+[project]
+name = "dcp-engine"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "ejhons", email = "ejhons.mail@gmail.com" }]
+requires-python = ">=3.14"
+dependencies = [
+    "jinja2",
+    "pydantic",
+    "networkx",
+    "python-docx",
+    "pypandoc",
+    "markdown",
+    "shortuuid",
+    "pandas",
+    "requests",
+    "rich",
+    "pypdfium2",
+    "xhtml2pdf",
+    "pyyaml>=6.0.3",
+    "openpyxl>=3.1.5",
+    "tabulate>=0.10.0",
+    "pypdf>=6.16.2",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.25,<0.12.0"]
+build-backend = "uv_build"
