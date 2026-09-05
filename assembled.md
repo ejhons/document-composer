@@ -1,7 +1,7 @@
 
 # Cover
 Everton
-![](C:/Users/evert/AppData/Local/Temp/pytest-of-evert/pytest-552/test_asembling_document0/img/image_generic.png)
+![](C:/Users/evert/AppData/Local/Temp/pytest-of-evert/pytest-562/test_asembling_document0/components/img/image_generic.png)
 
 # MEMORIAL TÉCNICO DE ENGENHARIA
 ## 1. Escopo Estrutural do Projeto: Generic project
@@ -11,7 +11,13 @@ O cálculo de dimensionamento dos pilares de sustentação, no empreendimento HE
 $$ \sigma = \frac{P}{A} \pm \frac{M}{W} $$
 
 Abaixo, apresentamos o diagrama lógico que descreve o fluxo de validação da infraestrutura da obra de Infraestrutura:
-![Diagram](C:/Users/evert/AppData/Local/Temp/pytest-of-evert/pytest-552/test_asembling_document0/img/rendered_inline_diagram_2f4b841dc9.png)
+```mermaid
+graph TD
+    A[Sondagem do Terreno] --> B(Análise de Carga)
+    B --> C{Carga Suportada?}
+    C -- Sim --> D[Fundação Direta]
+    C -- Não --> E[Estacas Profundas]
+```
 
 # Annex
 Generic project

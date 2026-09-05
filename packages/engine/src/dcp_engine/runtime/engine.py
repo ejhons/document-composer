@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from enum import StrEnum
 import logging
 from xmlrpc.client import Boolean
 
@@ -10,6 +11,7 @@ from dcp_engine.runtime.workspace import Workspace
 from dcp_engine.language.manifests.recipe import RecipeManifest
 from dcp_engine.runtime.execution.context import ExecutionContext
 from dcp_engine.runtime.execution.session import ExecutionSession
+from dcp_engine.solving.resolution.resolution_collector import PendingResolution
 
 logger = logging.getLogger("doc_engine.cache")
 
@@ -31,7 +33,7 @@ class Engine:
         self,
         workspace: Workspace,
         manifest: RecipeManifest,
-        context: ExecutionContext,
+        context: ExecutionContext | None = None,
     ) -> ExecutionSession:
         '''
         Creates a ExecutionSession object. 
@@ -50,11 +52,22 @@ class Engine:
     def create_interaction(
         self,
         session: ExecutionSession
-    ) -> IteractionResult:
+        ) -> IteractionResult:
+        # Builds graph from RecipeManifest
         session = self.planning.execute(session)
-        session = self.solving.execute(session)
+        # Raises exception if not solved/finshed with dependencies
+        result = self.solving.execute(session)
 
-        return None
+        
+        if result.resolved:
+            return IteractionResult.ready(
+                session=result.session
+            )
+
+        return IteractionResult.needs_input(
+            session=result.session,
+            pending=result.pending,
+        )
 
     
     def compile(
@@ -62,14 +75,46 @@ class Engine:
         session: ExecutionSession,
         output_path: str,
     ) -> CompilationResult:
+        '''
+        Only must be run when graph is completely solved.
+        Otherwise raises GraphNotSolvedException.
+        '''
         session = self.assembling.execute(session)
         session = self.compilation.execute(session, output_path)
 
         return None
+    
+
+class IteractionStatus(StrEnum):
+    NEEDS_INPUT='needs_input'
+    READY='ready'
+
 
 @dataclass(frozen=True)
 class IteractionResult:
-    solved:Boolean
+    solved:IteractionStatus
+    session: ExecutionSession
+    pending: PendingResolution | None = None
+
+    @classmethod
+    def ready(cls, session):
+        return cls(
+            solved=IteractionStatus.READY,
+            session=session
+        )
+    
+    @classmethod
+    def needs_input(
+        cls,
+        session,
+        pending:PendingResolution#list[PendingResolution]=[]
+    ):
+        return cls(
+            solved=IteractionStatus.NEEDS_INPUT,
+            session=session,
+            pending=pending
+        )
+    
 
 @dataclass(frozen=True)
 class CompilationResult:

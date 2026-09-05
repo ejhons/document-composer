@@ -1,13 +1,26 @@
+from enum import Enum, StrEnum
+
 from pydantic import BaseModel, Field
 from dcp_engine.planning.graph.graph import RecipeGraph
+from dcp_engine.solving.resolution.resolution_collector import PendingResolution
 
+class SolvingStatus(StrEnum):
+    RESOLVED = 'resolved'
+    PENDING = 'pending'
+    CHANGED =  'changed'
 
-class EngineResult(BaseModel):
+class SolvingResult(BaseModel):
     completed: bool
     graph: RecipeGraph | None = None
+    pending: PendingResolution | None = None
+    # pending: list[PendingResolution] = Field(default_factory=list)
     # outputs: dict[str, OutputArtifact]
     # diagnostics: list[Diagnostic]
     # execution_time: float
+
+    @property
+    def resolved(self) -> bool:
+        return self.status is SolvingStatus.RESOLVED
 
 class RuntimeResolutionResult(BaseModel):
     changed: bool = False

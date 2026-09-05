@@ -1,4 +1,7 @@
+from typing import Any
+from dataclasses import field
 from pydantic import BaseModel
+
 from dcp_engine.planning.graph.component_node import ComponentNode
 from dcp_engine.planning.graph.graph import RecipeGraph
 from dcp_engine.language.syntax.expressions.parser import ExpressionParser
@@ -51,6 +54,7 @@ class PendingCollector:
             #     if not dependency.resolution.resolved:
             #         resolution.pending_dependencies.add(dependency_id)
             #         # result.pending_dependencies[dependency.id] = PendingDependency(node_id=dependency.id)
+        
         resolved = all(
             node.resolution.resolved
             for node in graph.nodes.values()
@@ -60,9 +64,19 @@ class PendingCollector:
             for node in graph.nodes.values()
         )
 
+        pending = {
+            node.id : {
+                'inputs': node.resolution.pending_inputs,
+                'dependencies': node.resolution.pending_dependencies
+            }
+            for node in graph.nodes.values()
+            if not node.resolution.resolved
+        }
+
         return PendingResolution(
             resolved=resolved,
-            unchanged=unchanged
+            unchanged=unchanged,
+            pending=pending
         )
         
     def collect_variables(
@@ -80,6 +94,8 @@ class PendingCollector:
                 if input_name in resolution.resolved_inputs:
                     continue
                 resolution.pending_inputs.add(input_name)
+
+        
 
     def collect_dependencies(
             self,
@@ -102,6 +118,15 @@ class PendingCollector:
 class PendingResolution(BaseModel):
     resolved: bool
     unchanged: bool
+    pending:dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def pending_inputs(self):
+        return { item for p in self.pending.values() for item in p['inputs']}
+
+    @property
+    def pending_dependencies(self):
+        return { item for p in self.pending.values() for item in p['dependencies']}
 
     
     # pending_inputs: dict[str, PendingInput] = Field(default_factory=dict)

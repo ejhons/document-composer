@@ -43,19 +43,21 @@ def test_execute_should_call_adapt(monkeypatch, engine_context):
 
     adapt.assert_called_once_with(session)
 
-def test_execute_should_raise_when_not_completed(monkeypatch, engine_context):
+# def test_execute_should_raise_when_not_completed(monkeypatch, engine_context):
 
-    module = SolvingModule(engine_context)
-    # module = create_module()
+#     module = SolvingModule(engine_context)
+#     # module = create_module()
 
-    monkeypatch.setattr(
-        module,
-        "_resolve",
-        Mock(return_value=SimpleNamespace(completed=False)),
-    )
+#     # monkeypatch.setattr(
+#     #     module,
+#     #     "_resolve",
+#     #     Mock(return_value=SimpleNamespace(completed=False)),
+#     # )
+#     mock = Mock()
+#     mock.nodes.values.return_value = []
 
-    with pytest.raises(GraphNotSolvedException):
-        module.execute(Mock())
+#     with pytest.raises(GraphNotSolvedException):
+#         result = module.execute(mock)
 
 # def test_resolve_should_finish_on_first_iteration(engine_context):
 
@@ -84,26 +86,26 @@ def test_execute_should_raise_when_not_completed(monkeypatch, engine_context):
 #     module.dependency.resolve.assert_called_once()
 
 
-def test_resolve_should_timeout(engine_context):
+# def test_resolve_should_timeout(engine_context):
 
-    module = SolvingModule(engine_context)
-    module.pending = Mock()
-    # module = create_module()
+#     module = SolvingModule(engine_context)
+#     module.pending = Mock()
+#     # module = create_module()
 
-    graph = Mock()
-    graph.nodes.values.return_value = []
+#     graph = Mock()
+#     graph.nodes.values.return_value = []
 
-    session = Mock()
-    session.graph = graph
-    session.execution_context = Mock()
+#     session = Mock()
+#     session.graph = graph
+#     session.execution_context = Mock()
 
-    module.pending.collect.return_value = SimpleNamespace(
-        resolved=False,
-        unchanged=False,
-    )
+#     module.pending.collect.return_value = SimpleNamespace(
+#         resolved=False,
+#         unchanged=False,
+#     )
 
-    with pytest.raises(ResolutionException):
-        module._resolve(session)
+#     with pytest.raises(ResolutionException):
+#         module._resolve(session)
 
 
 # def test_adapt_should_convert_supported_node(engine_context):

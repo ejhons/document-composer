@@ -1,6 +1,6 @@
 # from pathlib import Path
 from typing import Any, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from dcp_engine.runtime.workspace import Workspace
 from dcp_engine.planning.graph.graph import RecipeGraph
@@ -11,7 +11,9 @@ from dcp_engine.language.syntax.markdown.atomized_markdown import AtomizedMarkdo
 
 class ExecutionSession(BaseModel):
     manifest:RecipeManifest
-    execution_context: ExecutionContext
+    execution_context: ExecutionContext = Field(
+        default_factory=ExecutionContext
+    )
     
     trace: Optional[Any] = None
     workspace: Optional[Workspace] = None

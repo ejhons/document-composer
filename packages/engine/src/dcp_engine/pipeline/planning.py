@@ -36,6 +36,10 @@ class PlanningModule:
             self,
             session: ExecutionSession
         ) -> ExecutionSession:
+        '''
+        Transforms recipe manifest into graph object ready for solving.
+        Updates session.graph
+        '''
         session.graph = self._build_graph(session)
 
         return session

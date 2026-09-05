@@ -1,7 +1,7 @@
 from dcp_engine.common.exceptions import GraphNotSolvedException, ResolutionException
 from dcp_engine.solving.solving_context import SolvingContext
 from dcp_engine.runtime.context import EngineContext
-from dcp_engine.runtime.result import EngineResult
+from dcp_engine.runtime.result import SolvingResult
 from dcp_engine.runtime.execution.session import ExecutionSession
 
 
@@ -37,23 +37,23 @@ class SolvingModule:
     def execute(
         self,
         session:ExecutionSession
-    ) -> ExecutionSession:
+    ) -> SolvingResult:
         '''
         Solves variables, dependencies and referencies.
         
         If solving proccess can't be executed, raises GraphNotSolvedExeception.
         '''
         result = self._resolve(session)
-        if not result.completed:
-            raise GraphNotSolvedException('Graph not solved yet')
+        if result.completed:
+            self._adapt(session)
+            # raise GraphNotSolvedException('Graph not solved yet')
 
-        self._adapt(session)
-        return session
+        return result#session
 
     def _resolve(
         self,
         session: ExecutionSession
-    ) -> EngineResult:        
+    ) -> SolvingResult:        
         '''
         Executes solving operation to components for variables and directives.
 
@@ -78,11 +78,19 @@ class SolvingModule:
             pending = self.pending.collect(graph)
 
             if pending.resolved and pending.unchanged:
-                return EngineResult(
+                return SolvingResult(
                     completed=pending.resolved and pending.unchanged,
                     graph=graph
-                )        
-        raise ResolutionException(f'Timeout=[{self.max_loops}]. Planning did not converge.')
+                )
+        
+        # if pending is not None:
+        return SolvingResult(
+            completed=False,
+            graph=graph,
+            pending=pending#pending.pending_inputs if pending is not None else set()
+        )
+               
+        # raise ResolutionException(f'Timeout=[{self.max_loops}]. Planning did not converge.')
 
     
     def _adapt(
