@@ -24,3 +24,6 @@ class ExecutionContext(BaseModel):
             for key,value in self.inputs
             if value is None
         ])
+
+    def update(self, inputs:dict[str, Any]):
+        self.inputs.update(inputs)

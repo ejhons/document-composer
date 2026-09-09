@@ -1,8 +1,12 @@
 from dataclasses import dataclass, field
 from enum import StrEnum
 import logging
+from pathlib import Path
+from typing import Any
 from xmlrpc.client import Boolean
 
+from dcp_engine.language.manifests.loader import ManifestLoader
+from dcp_engine.language.syntax.fields import InputDefinition
 from dcp_engine.pipeline.assembling import AssemblingModule
 from dcp_engine.pipeline.compilation import CompilationModule
 from dcp_engine.pipeline.planning import PlanningModule
@@ -23,31 +27,51 @@ class Engine:
         solving: SolvingModule,
         assembling: AssemblingModule,
         compilation: CompilationModule,
+        manifest_loader: ManifestLoader | None = None
     ):
         self.planning = planning
         self.solving = solving
         self.assembling = assembling
         self.compilation = compilation
+        self._manifest_loader = manifest_loader or ManifestLoader()
+        
 
     def create_session(
         self,
-        workspace: Workspace,
-        manifest: RecipeManifest,
-        context: ExecutionContext | None = None,
+        workspace: Workspace | str | Path,
+        *,
+        manifest: RecipeManifest | None = None,
+        context: ExecutionContext | None = None
     ) -> ExecutionSession:
         '''
         Creates a ExecutionSession object. 
 
         This object will be neccessary for trading informations through engine operations.
         '''
+        if isinstance(workspace, str):
+            workspace = Workspace(Path(root=workspace))
+
+        if isinstance(workspace, Path):
+            workspace = Workspace(root=workspace)
+
         session = ExecutionSession(
+            workspace=workspace,
             manifest = manifest,
-            execution_context = context,
             trace = [],
-            workspace=workspace
         )
+        if context is not None:
+            session.context = context
 
         return session
+
+    def reload_manifest(self, session: ExecutionSession):
+        if session.workspace is None:
+            raise Exception('Workspace not defined.')
+
+        session.manifest =  self._manifest_loader.load_manifest(session.workspace.recipe_path)
+
+        return session.manifest
+
 
     def create_interaction(
         self,
@@ -59,13 +83,13 @@ class Engine:
         result = self.solving.execute(session)
 
         
-        if result.resolved:
+        if result.completed:
             return IteractionResult.ready(
-                session=result.session
+                session=session
             )
 
         return IteractionResult.needs_input(
-            session=result.session,
+            session=session,
             pending=result.pending,
         )
 
@@ -73,16 +97,27 @@ class Engine:
     def compile(
         self,
         session: ExecutionSession,
-        output_path: str,
+        target_format: str
+        # output_path: str,
     ) -> CompilationResult:
         '''
         Only must be run when graph is completely solved.
         Otherwise raises GraphNotSolvedException.
         '''
-        session = self.assembling.execute(session)
-        session = self.compilation.execute(session, output_path)
+        session = self.assembling.execute(
+            session=session
+        )
+        
+        session = self.compilation.execute(
+            session=session,
+            target_format=target_format,
+            # target_format=output_path
+        )
 
-        return None
+        return CompilationResult(
+            format_text=target_format,
+            output_compiled=self.compilation.last_generated_file
+        )
     
 
 class IteractionStatus(StrEnum):
@@ -94,6 +129,8 @@ class IteractionStatus(StrEnum):
 class IteractionResult:
     solved:IteractionStatus
     session: ExecutionSession
+    input_definitions: dict[str, InputDefinition] = field(default_factory=dict)
+    dependencies: dict[str, InputDefinition] = field(default_factory=dict)
     pending: PendingResolution | None = None
 
     @classmethod
@@ -119,7 +156,7 @@ class IteractionResult:
 @dataclass(frozen=True)
 class CompilationResult:
     format_text: str
-    output_compiled: str
+    output_compiled: Path
 
 
 

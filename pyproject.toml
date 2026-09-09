@@ -8,6 +8,7 @@ dependencies = [
     "dcp-engine",
     "dcp-api",
     "dcp-shared",
+    "dcp-application",
     "pydantic>=2.13.4",
 ]
 
@@ -19,9 +20,11 @@ members = [
     "packages/engine",
     "packages/api",
     "packages/shared",
+    "packages/application",
 ]
 
 [tool.uv.sources]
 dcp-engine = { workspace = true }
 dcp-shared = { workspace = true }
 dcp-api = { workspace = true }
+dcp-application = { workspace = true }

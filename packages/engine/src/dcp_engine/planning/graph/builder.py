@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from dcp_engine.common.exceptions import GraphNotSolvedException
 from dcp_engine.language.manifests.recipe import RecipeManifest
 from dcp_engine.planning.graph.graph import RecipeGraph, SolvedGraph
@@ -19,12 +21,17 @@ class RecipeGraphBuilder():
     def build(
             self,
             manifest: RecipeManifest,
+            root: Path | str | None = None
         ) -> RecipeGraph:
         
         graph = RecipeGraph()
         for component in manifest.components:
             # Normaliza a localização do ComponentConfig
-            self.resource_resolver.resolve(component, component.source)
+            self.resource_resolver.resolve(
+                current=component,
+                source=component.source,
+                root=root
+            )
             # Nesse ponto, é garantido que a referência é absoluta.
             node = ComponentNode(component=component)
             graph.add_node(node)

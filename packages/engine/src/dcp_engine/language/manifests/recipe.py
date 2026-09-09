@@ -22,7 +22,7 @@ class RecipeManifest(BaseModel):
     components: List[ComponentConfig] = Field(default_factory=list)
     inputs: dict[str, Any] = Field(default_factory=dict)
     # Adicionamos o formato de saída padrão do documento (docx ou pdf)
-    target_format: Literal["docx", "pdf", "html"] = Field(default="docx")
+    target_format: Literal["docx", "pdf", "html", "md"] = Field(default="docx")
 
 
 class ComponentConfig(BaseModel):

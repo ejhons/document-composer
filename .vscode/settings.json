@@ -4,7 +4,9 @@
         "./packages/backend/src",
         "./packages/desktop/src",
         "./packages/frontend/src",
-        "./packages/shared/src"
+        "./packages/shared/src",
+        "./packages/aplication/src",
+        "./packages/cli/src"
     ],
     "python.testing.pytestArgs": [
         "--rootdir",

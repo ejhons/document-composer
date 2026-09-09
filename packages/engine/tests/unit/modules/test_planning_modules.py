@@ -1,9 +1,10 @@
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 from dcp_engine.language.manifests.recipe import RecipeManifest, StyleConfig
 from dcp_engine.pipeline.planning import PlanningModule
 from dcp_engine.runtime.execution.context import ExecutionContext
 from dcp_engine.runtime.execution.session import ExecutionSession
+from dcp_engine.runtime.workspace import Workspace
 
 
 @patch("dcp_engine.pipeline.planning.RecipeGraphBuilder")
@@ -14,12 +15,13 @@ def test_execute_should_build_graph(builder_cls, engine_context):
     mock_builder_instance.build.return_value = expected_graph
 
     session = ExecutionSession(
+        workspace=MagicMock(Workspace),
         manifest=RecipeManifest(
             recipe_name='test',
             version='1',
             style=StyleConfig()
         ),
-        execution_context=ExecutionContext()
+        context=ExecutionContext()
     )
 
     module = PlanningModule(

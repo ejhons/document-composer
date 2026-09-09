@@ -1,3 +1,4 @@
+from dcp_engine.compilation.compilers.implementations.md_compiler import MarkdownCompiler
 from dcp_engine.language.directives.implementations.include_directive import IncludeDirectiveHandler
 from dcp_engine.pipeline.assembling import AssemblingModule
 from dcp_engine.pipeline.compilation import CompilationModule
@@ -139,6 +140,10 @@ class EngineBuilder:
             .add_compiler(
                 "docx",
                 DocxCompiler(registry=builder.context.compiler_registry)
+            )\
+            .add_compiler(
+                "md",
+                MarkdownCompiler(registry=builder.context.compiler_registry)
             )
 
         return builder

@@ -6,12 +6,12 @@ from dcp_api.application.files import FileRepository
 from dcp_api.infrastructure.filesystem.project_repository import (
     ProjectNotFoundError,
 )
-from dcp_api.infrastructure.filesystem.workspace import Workspace
+from dcp_api.infrastructure.filesystem.workspace import WorkspaceEntity
 
 
 class FilesystemFileRepository(FileRepository):
 
-    def __init__(self, workspace: Workspace) -> None:
+    def __init__(self, workspace: WorkspaceEntity) -> None:
         self._workspace = workspace
 
     def list(self, project_id: str) -> list[Path]:

@@ -57,7 +57,7 @@ def test_adapter_pipeline_should_adapt_supported_nodes(
     session = ExecutionSession(
         graph=graph,
         manifest=recipe_manifest,
-        execution_context=ExecutionContext(),
+        context=ExecutionContext(),
         workspace=temp_workspace_object,
     )
 

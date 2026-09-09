@@ -7,14 +7,14 @@ from dcp_api.application.recipes import RecipeRepository
 from dcp_api.infrastructure.filesystem.project_repository import (
     ProjectNotFoundError,
 )
-from dcp_api.infrastructure.filesystem.workspace import Workspace
+from dcp_api.infrastructure.filesystem.workspace import WorkspaceEntity
 
 
 class FilesystemRecipeRepository(RecipeRepository):
 
     RECIPE_FILENAME = "recipe.json"
 
-    def __init__(self, workspace: Workspace) -> None:
+    def __init__(self, workspace: WorkspaceEntity) -> None:
         self._workspace = workspace
 
     def get(

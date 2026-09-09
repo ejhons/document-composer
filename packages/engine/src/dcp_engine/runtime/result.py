@@ -18,9 +18,9 @@ class SolvingResult(BaseModel):
     # diagnostics: list[Diagnostic]
     # execution_time: float
 
-    @property
-    def resolved(self) -> bool:
-        return self.status is SolvingStatus.RESOLVED
+    # @property
+    # def resolved(self) -> bool:
+    #     return self.pending self.status is SolvingStatus.RESOLVED
 
 class RuntimeResolutionResult(BaseModel):
     changed: bool = False

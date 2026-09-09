@@ -15,6 +15,7 @@ from dcp_engine.planning.graph.component_node import ComponentNode, Dependency
 from dcp_engine.planning.graph.graph import RecipeGraph
 from dcp_engine.runtime.execution.context import ExecutionContext
 from dcp_engine.runtime.execution.session import ExecutionSession
+from dcp_engine.runtime.workspace import Workspace
 from dcp_engine.solving.resolution.resolution_state import ResolutionState
 
 
@@ -41,8 +42,9 @@ def mock_session(
         mock_execution_context,
         mock_recipe_manifest):
     return ExecutionSession(
+        workspace=MagicMock(Workspace),
         manifest=mock_recipe_manifest,
-        execution_context=mock_execution_context
+        context=mock_execution_context
     )
 
 def test_execute_should_raise_when_graph_not_solved(

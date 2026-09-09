@@ -2,6 +2,7 @@ from typing import Any
 from dataclasses import field
 from pydantic import BaseModel
 
+from dcp_engine.language.syntax.fields import InputDefinition
 from dcp_engine.planning.graph.component_node import ComponentNode
 from dcp_engine.planning.graph.graph import RecipeGraph
 from dcp_engine.language.syntax.expressions.parser import ExpressionParser
@@ -64,20 +65,48 @@ class PendingCollector:
             for node in graph.nodes.values()
         )
 
-        pending = {
-            node.id : {
-                'inputs': node.resolution.pending_inputs,
-                'dependencies': node.resolution.pending_dependencies
-            }
-            for node in graph.nodes.values()
-            if not node.resolution.resolved
-        }
+        pending = self.extract_pending_inputs(graph)
+        # {
+        #     node.id : PendingItem(
+        #         inputs= node.resolution.pending_inputs,
+        #         dependencies= node.resolution.pending_dependencies
+        #     )
+        #     for node in graph.nodes.values()
+        #     if not node.resolution.resolved
+        # }
+        input_defintions = self.extract_input_definitions(graph)
+        # for node in graph.nodes.values():
+        #     for input in node.resolution.pending_inputs:
+        #         definition: InputDefinition = node.inspection.fields.get(input)
+        #         definition.
 
         return PendingResolution(
             resolved=resolved,
             unchanged=unchanged,
+            input_definitions=input_defintions,
             pending=pending
         )
+
+    
+    def extract_input_definitions(self, graph: RecipeGraph) -> dict[str, InputDefinition]:
+        variables = {}
+        for node in graph.nodes.values():
+            if node.inspection is None:
+                continue
+
+            variables.update(node.inspection.fields)
+
+        return variables
+
+    def extract_pending_inputs(self, graph: RecipeGraph) -> dict[str, PendingItem]:
+        return {
+            node.id : PendingItem(
+                inputs= node.resolution.pending_inputs,
+                dependencies= node.resolution.pending_dependencies
+            )
+            for node in graph.nodes.values()
+            if not node.resolution.resolved
+        }
         
     def collect_variables(
             self,
@@ -114,19 +143,24 @@ class PendingCollector:
 
             if not dependency.resolution.resolved:
                 resolution.pending_dependencies.add(dependency_id)
-        
+
+class PendingItem(BaseModel):
+    inputs: set[str]
+    dependencies: set[str]
+
 class PendingResolution(BaseModel):
     resolved: bool
     unchanged: bool
-    pending:dict[str, Any] = field(default_factory=dict)
+    input_definitions: dict[str, InputDefinition] = field(default_factory=dict)
+    pending:dict[str, PendingItem] = field(default_factory=dict)
 
     @property
     def pending_inputs(self):
-        return { item for p in self.pending.values() for item in p['inputs']}
+        return { item for p in self.pending.values() for item in p.inputs}
 
     @property
     def pending_dependencies(self):
-        return { item for p in self.pending.values() for item in p['dependencies']}
+        return { item for p in self.pending.values() for item in p.dependencies}
 
     
     # pending_inputs: dict[str, PendingInput] = Field(default_factory=dict)

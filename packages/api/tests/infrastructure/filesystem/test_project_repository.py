@@ -6,19 +6,19 @@ from dcp_api.infrastructure.filesystem.project_repository import (
     FilesystemProjectRepository,
     ProjectNotFoundError,
 )
-from dcp_api.infrastructure.filesystem.workspace import Workspace
+from dcp_api.infrastructure.filesystem.workspace import WorkspaceEntity
 
 
 @pytest.fixture
-def workspace(tmp_path: Path) -> Workspace:
-    workspace = Workspace(tmp_path)
+def workspace(tmp_path: Path) -> WorkspaceEntity:
+    workspace = WorkspaceEntity(tmp_path)
     workspace.initialize()
     return workspace
 
 
 @pytest.fixture
 def repository(
-    workspace: Workspace,
+    workspace: WorkspaceEntity,
 ) -> FilesystemProjectRepository:
     return FilesystemProjectRepository(workspace)
 

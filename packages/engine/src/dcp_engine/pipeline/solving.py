@@ -44,11 +44,16 @@ class SolvingModule:
         If solving proccess can't be executed, raises GraphNotSolvedExeception.
         '''
         result = self._resolve(session)
+        self._update_context(session)
+
         if result.completed:
             self._adapt(session)
             # raise GraphNotSolvedException('Graph not solved yet')
 
         return result#session
+
+    # def extract
+
 
     def _resolve(
         self,
@@ -61,7 +66,7 @@ class SolvingModule:
         In case the given number of repetitions are not enough, raises ResolutionException indicating non-convergence.
         '''
         graph = session.graph
-        context = session.execution_context
+        context = session.context
 
         for _ in range(self.max_loops):
             self.inspection_pipeline.execute(
@@ -91,6 +96,18 @@ class SolvingModule:
         )
                
         # raise ResolutionException(f'Timeout=[{self.max_loops}]. Planning did not converge.')
+
+
+    def _update_context(self, session: ExecutionSession):
+        fields = dict(session.context.inputs)
+        for node in session.graph.nodes.values():
+            if node.inspection is None:
+                continue
+            for field in node.inspection.fields.keys():
+                fields[field] = fields.get(field, None)
+
+        session.context.inputs.update(fields)
+
 
     
     def _adapt(

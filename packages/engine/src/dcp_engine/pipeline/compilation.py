@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from dcp_engine.runtime.context import EngineContext
 from dcp_engine.runtime.execution.session import ExecutionSession
 
@@ -15,14 +17,16 @@ class CompilationModule:
         self.output_path = output_path
         self.output_name = output_name
         self.temp_file_name = temp_file_name
+        self.last_generated_file : Path | None = None
 
 
     def execute(
         self,
         session:ExecutionSession,
-        target_format: str | None = None
+        target_format: str
     ) -> ExecutionSession:
-        target_format = target_format or session.manifest.target_format
+        # target_format = session.manifest.target_format
+        # print("road", target_format)
         compiler = self.compiler_registry.get(target_format)
 
         output_path_object = session.workspace.dir_from_root(
@@ -46,5 +50,7 @@ class CompilationModule:
             source_markdown_path=temp_path.as_posix(),
             output_path= output_path_object.as_posix()
         )        
+
+        self.last_generated_file = output_path_object
 
         return session

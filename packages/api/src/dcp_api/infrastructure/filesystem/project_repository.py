@@ -6,7 +6,7 @@ import shutil
 
 from dcp_api.domain.project import Project
 from dcp_api.application.projects import ProjectRepository
-from dcp_api.infrastructure.filesystem.workspace import Workspace
+from dcp_api.infrastructure.filesystem.workspace import WorkspaceEntity
 
 
 class FilesystemProjectRepository(ProjectRepository):
@@ -15,7 +15,7 @@ class FilesystemProjectRepository(ProjectRepository):
     """
     PROJECT_METADATA = "project.json"
 
-    def __init__(self, workspace: Workspace) -> None:
+    def __init__(self, workspace: WorkspaceEntity) -> None:
         self._workspace = workspace
 
     def create(self, name: str) -> Project:

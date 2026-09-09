@@ -63,7 +63,7 @@ class Workspace(BaseModel):
     def recipe_path(self) -> Path:
         return self.root / self._relative_recipe_name
 
-    def generated_path(self, extension: str):
+    def generated_path(self, extension: str) -> Path:
         filename = self._relative_generated_name + '.' + extension
         return self.outputs_dir / filename 
 

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document Composer</title>
+    <link rel="stylesheet" href="./static/css/styles.css">
+</head>
+
+<body>
+
+    <div class="app">
+        <!-- ==================================================
+         SIDEBAR
+        =================================================== -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">DC</div>
+                <div>
+                    <strong>Document Composer</strong>
+                    <span>Local workspace</span>
+                </div>
+            </div>
+
+            <strong>Projetos</strong>
+            <div class="projects-header">
+                <button class="button" style="padding: 3px 8px" onclick="openProjectModal()">
+                    + Novo Projeto
+                </button>
+            </div>
+
+            <!-- <nav>
+                <button class="nav-item active" data-view="projects">Projetos</button>
+                <button class="nav-item" data-view="recipes">Receitas</button>
+            </nav> -->
+
+            <div id="projectList" class="project-list">
+                <!-- Projetos carregados pela API -->
+            </div>
+
+            <div class="sidebar-footer">
+                <span class="status-dot"></span>
+                API local conectada
+            </div>
+        </aside>
+
+        <!-- ==================================================
+         MAIN
+        =================================================== -->
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <h1 id="pageTitle" class="topbar-title">
+                        Selecione um projeto
+                    </h1>
+                    <p id="pageSubtitle">
+                        Gerencie seus documentos e componentes.
+                    </p>
+                </div>
+
+                <div>
+                    <button class="button" onclick="loadProjects()">
+                        Atualizar
+                    </button>
+                </div>
+
+            </header>
+
+
+            <section class="content">
+                <div id="emptyState" class="card">
+                    <div class="empty">
+                        <strong>Nenhum projeto selecionado</strong>
+                        <span>Crie ou selecione um projeto para começar.</span>
+                    </div>
+                </div>
+
+                <div id="projectWorkspace" style="display:none">
+                    <!-- ==================================================
+                FILES
+                =================================================== -->
+                    <section class="card">
+                        <div class="card-header">
+                            <h2>Componentes</h2>
+
+                            <label class="button primary" style="margin:0">
+                                Adicionar arquivo
+                                <input id="fileInput" type="file" multiple hidden onchange="uploadFiles()">
+                            </label>
+                        </div>
+
+                        <div class="card-body">
+                            <div id="fileList" class="file-list">
+                            </div>
+                        </div>
+
+                    </section>
+
+
+                    <!-- ==================================================
+                     RECIPE
+                =================================================== -->
+
+                    <section class="card">
+
+                        <div class="card-header">
+
+                            <h2>Recipe Manifest</h2>
+
+                            <button class="button" onclick="saveRecipe()">
+                                Salvar recipe
+                            </button>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <textarea id="recipeEditor" spellcheck="false"></textarea>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ==================================================
+                     RECIPE
+                =================================================== -->
+
+                    <section class="card">
+                        <div class="card-header">
+                            <h2>Iteraction</h2>
+
+                            <button class="button" onclick="saveRecipe()">
+                                Criar iteração
+                            </button>
+
+                        </div>
+                        <div class="card-body">
+                            <div class="variables">
+                                <div class="form-group">
+                                    <label for="variablesEditor">Variáveis</label>
+                                    <textarea id="variablesEditor" spellcheck="false">{}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                    </section>
+
+                    <!-- ==================================================
+                    COMPILATION
+                =================================================== -->
+                    <section class="card">
+                        <div class="card-header">
+                            <h2>Compilação</h2>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="compile-panel">
+                                <div class="form-group">
+                                    <label for="targetFormat">
+                                        Formato
+                                    </label>
+                                    <select id="targetFormat">
+                                        <option value="pdf">PDF</option>
+                                        <option value="docx">DOCX</option>
+                                        <option value="html">HTML</option>
+                                    </select>
+                                </div>
+                                <div></div>
+
+                                <button id="compileButton" class="button primary" onclick="compileProject()">
+                                    Compilar documento
+                                </button>
+                            </div>
+
+
+                            <!-- <div class="variables">
+                                <div class="form-group">
+                                    <label for="variablesEditor">Variáveis</label>
+                                    <textarea id="variablesEditor" spellcheck="false">{}</textarea>
+                                </div>
+                            </div> -->
+
+                            <div id="compileStatus" class="compile-status" style="display:none"></div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+        </main>
+
+        <!-- ======================================================
+            CREATE PROJECT MODAL
+        ======================================================= -->
+        <div id="projectModal" class="modal-backdrop">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Novo projeto</h2>
+                    <button class="button" onclick="closeProjectModal()">
+                        ×
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="projectName">
+                            Nome
+                        </label>
+                        <input id="projectName" type="text" placeholder="Ex.: Relatório hidráulico">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="button" onclick="closeProjectModal()">
+                        Cancelar
+                    </button>
+                    <button class="button primary" onclick="createProject()">
+                        Criar projeto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./static/js/app.js"></script>
+</body>
+
+</html>

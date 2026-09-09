@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document Composer</title>
+    <link rel="stylesheet" href="./static/css/styles.css">
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">DC</div>
+            <div>
+                <strong>Document Composer</strong>
+                <span>Local workspace</span>
+            </div>
+        </div>
+
+        <button class="new-project" id="newProjectBtn" onclick="openProjectModal()">
+            + Novo projeto
+        </button>
+
+        <nav>
+            <button class="nav-item active" data-view="projects">Projetos</button>
+            <button class="nav-item" data-view="recipes">Receitas</button>
+        </nav>
+
+        <div class="project-list" id="projectList">
+            <!-- Projetos carregados pela API -->
+        </div>
+
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            API local conectada
+        </div>
+    </aside>
+
+    <!-- ==================================================
+        MAIN
+    =================================================== -->
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1 id="pageTitle">Selecione um Projeto</h1>
+                <p id="pageSubtitle">Gerencie seus documentos e componentes.</p>
+            </div>
+            <div class="api-status" id="apiStatus">Verificando API...</div>
+            <div>
+                <button class="button" onclick="loadProjects()">
+                    Atualizar
+                </button>
+            </div>
+        </header>
+
+        <section id="projectsView" class="view active">
+        <!-- <section id="projectsView" class="view active"> -->
+            <div class="toolbar">
+                <input id="projectSearch" class="search" type="search" placeholder="Buscar projeto...">
+                <button class="button primary" id="refreshProjectsBtn">Atualizar</button>
+            </div>
+            <div id="projectsGrid" class="project-grid"></div>
+        </section>
+
+        <section id="projectView" class="view">
+            <div class="project-header">
+                <button class="back-button" id="backBtn">← Projetos</button>
+                <div>
+                    <h2 id="projectName"></h2>
+                    <p id="projectId"></p>
+                </div>
+                <button class="button danger" id="deleteProjectBtn">Excluir</button>
+            </div>
+
+            <div class="workspace-grid">
+                <section class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Componentes</h3>
+                            <p>Arquivos usados pela receita.</p>
+                        </div>
+                        <label class="button secondary upload-button">
+                            + Adicionar arquivo
+                            <input id="fileInput" type="file" multiple hidden>
+                        </label>
+                    </div>
+                    <div id="filesList" class="file-list"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Receita</h3>
+                            <p>Manifesto do documento.</p>
+                        </div>
+                        <button class="button secondary" id="loadRecipeBtn">Carregar</button>
+                    </div>
+                    <textarea id="recipeEditor" class="code-editor" spellcheck="false"></textarea>
+                    <button class="button primary full" id="saveRecipeBtn">Salvar receita</button>
+                </section>
+            </div>
+
+            <section class="panel compile-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Compilação</h3>
+                        <p>Resolve o projeto, monta o documento e gera o artefato.</p>
+                    </div>
+                </div>
+
+                <div class="compile-controls">
+                    <label>
+                        Formato
+                        <select id="targetFormat">
+                            <option value="pdf">PDF</option>
+                            <option value="docx">DOCX</option>
+                            <option value="html">HTML</option>
+                        </select>
+                    </label>
+
+                    <label class="variables-field">
+                        Variáveis <span>(JSON)</span>
+                        <textarea id="variablesEditor" spellcheck="false">{}</textarea>
+                    </label>
+
+                    <button class="button primary compile-button" id="compileBtn">Compilar documento</button>
+                </div>
+
+                <div id="compileResult" class="result hidden"></div>
+            </section>
+        </section>
+
+        <section id="recipesView" class="view">
+            <div class="empty-state">
+                <div class="empty-icon">⌘</div>
+                <h2>Receitas por projeto</h2>
+                <p>Abra um projeto para editar sua receita.</p>
+            </div>
+        </section>
+    </main>
+
+    <dialog id="projectDialog">
+        <form method="dialog" id="projectForm" class="dialog-card">
+            <h2>Novo projeto</h2>
+            <p>Crie um workspace para seu documento.</p>
+            <label>
+                Nome do projeto
+                <input id="projectNameInput" required maxlength="200" autocomplete="off">
+            </label>
+            <div class="dialog-actions">
+                <button type="button" class="button secondary" id="cancelDialogBtn">Cancelar</button>
+                <button type="submit" class="button primary">Criar projeto</button>
+            </div>
+        </form>
+    </dialog>
+
+    <div id="toast" class="toast"></div>
+    <script src="./static/js/app.js"></script>
+</body>
+
+</html>

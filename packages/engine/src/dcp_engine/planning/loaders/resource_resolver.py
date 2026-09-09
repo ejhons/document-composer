@@ -11,25 +11,38 @@ class LocalResourceResolver(ResourceResolver):
     def normalize(
             self,
             current: ComponentConfig,
-            source: str
+            source: str,
+            root: Path | str | None = None
         ) -> str:
         '''
         Normaliza o endereço para um endereço global.
-        '''        
+        '''
+        if root is None:
+            root =  Path(current.source).parent
+
+        if isinstance(root, str):
+            root = Path(str)
+
         source = (
-            Path(current.source)
-            .parent
+            # Path(current.source)
+            # .parent
+            root
             .joinpath(source)
             .resolve()
             .as_posix()
         )
+        print(root)
+        print(source)
+        print(current.source)
         return source
         # return Path(source).resolve().as_posix()
 
     def resolve(
         self,
         current: ComponentConfig,
-        source: str
+        source: str,
+        *,
+        root: Path | str | None = None
     ) -> str:
         # source = (
         #     Path(current.source)
@@ -39,5 +52,6 @@ class LocalResourceResolver(ResourceResolver):
         #     .as_posix()
         # )
         # return source
-        current.source = self.normalize(current, source)
+        # print(root)
+        current.source = self.normalize(current, source, root)
         return current.source
