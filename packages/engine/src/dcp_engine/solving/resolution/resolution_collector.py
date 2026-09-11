@@ -1,4 +1,3 @@
-from typing import Any
 from dataclasses import field
 from pydantic import BaseModel
 
@@ -155,13 +154,20 @@ class PendingResolution(BaseModel):
     pending:dict[str, PendingItem] = field(default_factory=dict)
 
     @property
-    def pending_inputs(self):
+    def pending_inputs(self) -> set[str]:
         return { item for p in self.pending.values() for item in p.inputs}
 
     @property
-    def pending_dependencies(self):
+    def pending_dependencies(self) -> set[str]:
         return { item for p in self.pending.values() for item in p.dependencies}
 
+
+    @property
+    def pending_inputs_definition(self) -> dict[str, InputDefinition]:
+        return {
+            key: self.input_definitions.get(key)
+            for key in self.pending_inputs
+        }
     
     # pending_inputs: dict[str, PendingInput] = Field(default_factory=dict)
     # pending_dependencies: dict[str, PendingDependency] = Field(default_factory=dict)

@@ -1,17 +1,19 @@
 import pytest
 
 from dcp_engine.runtime.builder import EngineBuilder
+from dcp_engine.runtime.engine import Engine
 from dcp_engine.runtime.execution.context import ExecutionContext
 from dcp_engine.runtime.execution.session import ExecutionSession
 
 
 def end_to_end(
-    full_engine,
+    # engine,
     temp_workspace,
     markdown_file,
     recipe_manifest,
-    planning_context,
-    scheduler
+    build_engine
+    # planning_context,
+    # scheduler
 ):
 
     markdown_file(
@@ -94,27 +96,37 @@ graph TD
             'flow': 35.0,
         }
     )
+    workspace = build_engine.init_workspace()
 
-    session: ExecutionSession = full_engine.create_session(
+    session: ExecutionSession = build_engine.create_session(
+        workspace=temp_workspace,
         manifest=recipe_manifest,
         context=execution_context
     )
 
-    full_engine.build_graph(
-        session
-    )
-    
-    full_engine.resolve(
-        session
-    )
-
-
-    execution_plan = full_engine.plan(
+    output_path = temp_workspace.default_output()
+    iteraction_result = build_engine.create_interaction(session)
+    result = build_engine.compile(
         session,
-        scheduler
+        target_format='default'
     )
 
+    # engine.build_graph(
+    #     session
+    # )
     
-    document = EngineBuilder().build(session.graph)
+    # engine.resolve(
+    #     session
+    # )
 
-    assert document is not None
+
+    # execution_plan = engine.plan(
+    #     session,
+    #     scheduler
+    # )
+
+    
+    # engine: Engine = EngineBuilder().build(session.graph)
+    # assert engine is not None
+    # session = engine.create_session(temp_workspace)
+    # assert session is not None

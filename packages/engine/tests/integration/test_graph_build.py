@@ -18,7 +18,7 @@ def test_manifest_should_be_converted_to_graph():
                 source="a.md"
             ),
             ComponentConfig(
-                type="external",
+                # type="external",
                 source="b.pdf"
             ),
         ]
@@ -28,8 +28,8 @@ def test_manifest_should_be_converted_to_graph():
         def normalize(self, source):
             return super().normalize(source)
         
-        def resolve(self, component, source):
-            component.source = f"/tmp/{source}"
+        def resolve(self, current, source, root):
+            current.source = f"/tmp/{source}"
 
     graph = RecipeGraphBuilder(
         DummyResolver()

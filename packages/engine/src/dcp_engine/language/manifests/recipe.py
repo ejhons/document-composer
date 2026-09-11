@@ -1,3 +1,4 @@
+from enum import StrEnum
 from pathlib import Path
 
 from pydantic import BaseModel, Field, model_validator
@@ -24,10 +25,13 @@ class RecipeManifest(BaseModel):
     # Adicionamos o formato de saída padrão do documento (docx ou pdf)
     target_format: Literal["docx", "pdf", "html", "md"] = Field(default="docx")
 
+class ComponentType(StrEnum):
+    INTERNAL = 'internal'
+    EXTERNAL = 'external'
 
 class ComponentConfig(BaseModel):
     # id: str# = Field(default_factory = IdGenerator.generate)
-    type: Literal["template", "external", "generated"]
+    # type: Literal["template", "external", "generated"]
     source: str
     file_format: Optional[Literal["md", "docx", "pdf", "xlsx", "image", "html"]] = None
     is_required: bool = True
@@ -39,11 +43,28 @@ class ComponentConfig(BaseModel):
     @property
     def solvable(self):
         return (
-            self.type == 'template'
-            or
+            # self.type == 'template'
+            # or
             self.file_format == 'md'
         )
 
+    def type(self, component_folder: Path):
+        '''
+        Identifies if file 
+        '''
+        # Relative addresses can only correspond to files in workspace
+        if not Path(str).is_absolute():
+            return ComponentType.INTERNAL
+        # If component folder is not given, absolute paths are treated as External
+        if component_folder is None:
+            return ComponentType.EXTERNAL
+        # If component is in component folder it's marked as Internal to Workspace
+        if Path(str).is_relative_to(component_folder):
+            return ComponentType.INTERNAL
+        # Otherwise, file is External.
+        return ComponentType.EXTERNAL
+
+    
     @model_validator(mode="after")
     def infer_file_format(self):
         if self.file_format is not None:

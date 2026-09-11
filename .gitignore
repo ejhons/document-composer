@@ -220,3 +220,4 @@ __marimo__/
 # Ignore generated output files
 # engine/src/doc_engine/output/
 workspace/
+*.msi

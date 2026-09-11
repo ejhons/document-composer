@@ -13,6 +13,7 @@ from dcp_engine.language.syntax.expressions.parser import ExpressionParser
 from dcp_engine.planning.loaders.resource_resolver import LocalResourceResolver
 from dcp_engine.planning.resolution.dependency_resolver import DependencyResolver
 from dcp_engine.planning.resolution.runtime_resolver import RuntimeResolver
+from dcp_engine.runtime.builder import EngineBuilder
 from dcp_engine.runtime.context import EngineContext
 from dcp_engine.runtime.engine import Engine
 from dcp_engine.runtime.workspace import Workspace
@@ -102,6 +103,13 @@ def engine():
     )
     return engine
 
+
+@pytest.fixture
+def build_engine():
+    engine_builder = EngineBuilder.default()
+    build_engine = engine_builder.build()
+
+    return build_engine
 # pytest_plugins = [
 #     "tests.fixtures.auth_fixtures",
 #     "tests.fixtures.db_fixtures",

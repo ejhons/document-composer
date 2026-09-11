@@ -27,6 +27,9 @@ class CompilationModule:
     ) -> ExecutionSession:
         # target_format = session.manifest.target_format
         # print("road", target_format)
+        if target_format=='default':
+            target_format = session.manifest.target_format
+            
         compiler = self.compiler_registry.get(target_format)
 
         output_path_object = session.workspace.dir_from_root(

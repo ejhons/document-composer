@@ -16,7 +16,7 @@ class ResolutionKind(str, Enum):
 
 
 @dataclass(frozen=True, slots=True)
-class PendingResolution:
+class PendingResolutionDomain:
     id: str
     kind: ResolutionKind
     name: str

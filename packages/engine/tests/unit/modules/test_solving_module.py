@@ -30,6 +30,12 @@ def test_execute_should_call_adapt(monkeypatch, engine_context):
         "_resolve",
         Mock(return_value=SimpleNamespace(completed=True)),
     )
+    
+    monkeypatch.setattr(
+        module,
+        "_update_context",
+        Mock(),#return_value=SimpleNamespace(completed=True)),
+    )
 
     adapt = Mock()
 

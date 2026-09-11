@@ -85,7 +85,7 @@ class EngineBuilder:
         self.context.dependency_resolver = resolver
         return self
 
-    def build(self):
+    def build(self) -> Engine:
         planning = PlanningModule(self.context)
         solving = SolvingModule(self.context)
         assembling = AssemblingModule(self.context)

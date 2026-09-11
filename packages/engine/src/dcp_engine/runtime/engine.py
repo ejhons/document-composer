@@ -11,6 +11,7 @@ from dcp_engine.pipeline.assembling import AssemblingModule
 from dcp_engine.pipeline.compilation import CompilationModule
 from dcp_engine.pipeline.planning import PlanningModule
 from dcp_engine.pipeline.solving import SolvingModule
+from dcp_engine.runtime.execution.metadata import Metadata
 from dcp_engine.runtime.workspace import Workspace
 from dcp_engine.language.manifests.recipe import RecipeManifest
 from dcp_engine.runtime.execution.context import ExecutionContext
@@ -27,7 +28,7 @@ class Engine:
         solving: SolvingModule,
         assembling: AssemblingModule,
         compilation: CompilationModule,
-        manifest_loader: ManifestLoader | None = None
+        manifest_loader: ManifestLoader | None = None,
     ):
         self.planning = planning
         self.solving = solving
@@ -35,6 +36,39 @@ class Engine:
         self.compilation = compilation
         self._manifest_loader = manifest_loader or ManifestLoader()
         
+
+    def reload_manifest(self, session: ExecutionSession) -> RecipeManifest:
+        if session.workspace is None:
+            raise Exception('Workspace not defined.')
+
+        session.manifest = self._manifest_loader.load_manifest(session.workspace.recipe_path)
+
+        return session.manifest
+
+    def reload_metadata(self, session: ExecutionSession) -> Metadata:
+        if session.workspace is None:
+            raise Exception('Workspace not defined.')
+
+        session.metadata =  Metadata.from_json_file(session.workspace.metadata_path)
+
+        return session.metadata
+
+    def init_workspace(
+            self,
+            root: str | Path
+    ) -> Workspace:
+        '''
+        Creates ExecutionSession and saves it in Repository.
+        '''
+        if isinstance(root, str):
+            root = Path(root)
+
+        workspace = Workspace(
+            root=root
+        )
+        workspace.init()
+
+        return workspace
 
     def create_session(
         self,
@@ -45,7 +79,6 @@ class Engine:
     ) -> ExecutionSession:
         '''
         Creates a ExecutionSession object. 
-
         This object will be neccessary for trading informations through engine operations.
         '''
         if isinstance(workspace, str):
@@ -63,14 +96,6 @@ class Engine:
             session.context = context
 
         return session
-
-    def reload_manifest(self, session: ExecutionSession):
-        if session.workspace is None:
-            raise Exception('Workspace not defined.')
-
-        session.manifest =  self._manifest_loader.load_manifest(session.workspace.recipe_path)
-
-        return session.manifest
 
 
     def create_interaction(
@@ -132,6 +157,17 @@ class IteractionResult:
     input_definitions: dict[str, InputDefinition] = field(default_factory=dict)
     dependencies: dict[str, InputDefinition] = field(default_factory=dict)
     pending: PendingResolution | None = None
+
+    @property
+    def is_solved(self):
+        return self.solved == IteractionStatus.READY
+
+    @property
+    def pending_inputs(self) -> list[InputDefinition]:
+        return [
+            self.input_definitions.get(key)
+            for key in self.pending.pending_inputs
+        ]
 
     @classmethod
     def ready(cls, session):

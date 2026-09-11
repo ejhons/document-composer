@@ -9,7 +9,7 @@ from warnings import deprecated
 from dcp_api.domain.iteraction import (
     IterationSession,
     IterationStatus,
-    PendingResolution,
+    PendingResolutionDomain,
     ResolutionKind,
 )
 
@@ -66,7 +66,7 @@ class FilesystemIterationRepository:
                 {},
             ),
             pending=[
-                PendingResolution(
+                PendingResolutionDomain(
                     id=item["id"],
                     kind=ResolutionKind(
                         item["kind"]

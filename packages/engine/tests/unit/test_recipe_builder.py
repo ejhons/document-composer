@@ -25,8 +25,12 @@ def test_build_empty_manifest_returns_empty_graph():
 
 def test_build_should_resolve_every_component():
     components = [
-        ComponentConfig(type="template", source="a.md"),
-        ComponentConfig(type="template", source="b.md"),
+        ComponentConfig(
+            # type="template", 
+            source="a.md"),
+        ComponentConfig(
+            # type="template", 
+            source="b.md"),
     ]
 
     manifest = RecipeManifest(
@@ -38,20 +42,26 @@ def test_build_should_resolve_every_component():
 
     resolver = Mock(spec=ResourceResolver)
 
-    RecipeGraphBuilder(resolver).build(manifest)
+    RecipeGraphBuilder(resolver).build(manifest, None)
 
     resolver.resolve.assert_has_calls([
-        call(components[0], "a.md"),
-        call(components[1], "b.md"),
+        call(current=components[0], source="a.md", root=None),
+        call(current=components[1], source="b.md", root=None),
     ])
 
     assert resolver.resolve.call_count == 2
 
 def test_build_should_create_all_nodes():
     components = [
-        ComponentConfig(type="template", source="a.md"),
-        ComponentConfig(type="template", source="b.md"),
-        ComponentConfig(type="template", source="c.md"),
+        ComponentConfig(
+            # type="template",
+            source="a.md"),
+        ComponentConfig(
+            # type="template",
+            source="b.md"),
+        ComponentConfig(
+            # type="template",
+            source="c.md"),
     ]
 
     manifest = RecipeManifest(
@@ -70,7 +80,7 @@ def test_build_should_create_all_nodes():
 
 def test_build_should_use_normalized_source():
     component = ComponentConfig(
-        type="template",
+        # type="template",
         source="relative.md"
     )
 
@@ -83,12 +93,12 @@ def test_build_should_use_normalized_source():
 
     resolver = Mock(spec=ResourceResolver)
 
-    def normalize(component, source):
-        component.source = "/tmp/relative.md"
+    def normalize(current, source,*, root):
+        current.source = "/tmp/relative.md"
 
     resolver.resolve.side_effect = normalize
 
-    graph = RecipeGraphBuilder(resolver).build(manifest)
+    graph = RecipeGraphBuilder(resolver).build(manifest, None)
 
     node = next(iter(graph.nodes.values()))
 

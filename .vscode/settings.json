@@ -1,10 +1,7 @@
 {
     "python.analysis.extraPaths": [
         "./packages/engine/src",
-        "./packages/backend/src",
-        "./packages/desktop/src",
-        "./packages/frontend/src",
-        "./packages/shared/src",
+        "./packages/api/src",
         "./packages/aplication/src",
         "./packages/cli/src"
     ],

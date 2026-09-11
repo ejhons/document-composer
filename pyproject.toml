@@ -6,9 +6,9 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "dcp-engine",
-    "dcp-api",
-    "dcp-shared",
     "dcp-application",
+    "dcp-cli",
+    "dcp-api",
     "pydantic>=2.13.4",
 ]
 
@@ -19,12 +19,12 @@ dev = ["pytest>=9.1.1"]
 members = [
     "packages/engine",
     "packages/api",
-    "packages/shared",
+    "packages/cli",
     "packages/application",
 ]
 
 [tool.uv.sources]
 dcp-engine = { workspace = true }
-dcp-shared = { workspace = true }
-dcp-api = { workspace = true }
 dcp-application = { workspace = true }
+dcp-cli = { workspace = true }
+dcp-api = { workspace = true }

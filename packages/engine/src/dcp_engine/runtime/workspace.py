@@ -12,32 +12,20 @@ class Workspace(BaseModel):
     root: Path
 
     # Atributos privados com valores padrão (Pydantic v2)
-    _relative_recipe_name: str = PrivateAttr('recipe.json')
-    _relative_generated_name: str = PrivateAttr('document')
+    _recipe_name: str = PrivateAttr('recipe.json')
+    _metadata_name: str = PrivateAttr('metadata.json')
+    _generated_name: str = PrivateAttr('document')
 
-    _relative_assets_dir: str = PrivateAttr('assets')
     _relative_components_dir: str = PrivateAttr('components')
-    _relative_outputs_dir: str = PrivateAttr('outputs')
+    _relative_outputs_dir: str = PrivateAttr('output')
     _relative_build_dir: str = PrivateAttr('build')
             
+    _relative_assets_dir: str = PrivateAttr('output/assets')
     _relative_images_dir: str = PrivateAttr('img')
     _relative_documents_dir: str = PrivateAttr('docs')
     _relative_spreadsheets_dir: str = PrivateAttr('sheets')
 
     _relative_temp_dir: str = PrivateAttr('tmp')
-
-
-    @property
-    def images_dir(self) -> Path:
-        return self.root / self._relative_components_dir / self._relative_images_dir
-
-    @property
-    def documents_dir(self) -> Path:
-        return self.root / self._relative_components_dir / self._relative_documents_dir
-
-    @property
-    def spreadsheets_dir(self) -> Path:
-        return self.root / self._relative_components_dir / self._relative_spreadsheets_dir
 
     @property
     def components_dir(self) -> Path:
@@ -46,6 +34,18 @@ class Workspace(BaseModel):
     @property
     def assets_dir(self) -> Path:
         return self.root / self._relative_assets_dir
+
+    @property
+    def images_dir(self) -> Path:
+        return self.root / self._relative_assets_dir / self._relative_images_dir
+
+    @property
+    def documents_dir(self) -> Path:
+        return self.root / self._relative_assets_dir / self._relative_documents_dir
+
+    @property
+    def spreadsheets_dir(self) -> Path:
+        return self.root / self._relative_assets_dir / self._relative_spreadsheets_dir
     
     @property
     def build_dir(self) -> Path:
@@ -61,10 +61,14 @@ class Workspace(BaseModel):
 
     @property
     def recipe_path(self) -> Path:
-        return self.root / self._relative_recipe_name
+        return self.root / self._recipe_name
+    
+    @property
+    def metadata_path(self) -> Path:
+        return self.root / self._metadata_name
 
     def generated_path(self, extension: str) -> Path:
-        filename = self._relative_generated_name + '.' + extension
+        filename = self._generated_name + '.' + extension
         return self.outputs_dir / filename 
 
     # @property
@@ -120,29 +124,29 @@ class Workspace(BaseModel):
             # os.makedirs(path_dir, exist_ok=exists_ok)
             
         return path
+
     
-    # _relative_assets_dir: str = 'assets'
-    # _relative_images_dir: str = 'img'
-    # _relative_documents_dir: str = 'docs'
-    # _relative_spreadsheets_dir: str = 'sheets'
-    # _relative_temp_dir: str = 'tmp'
+    def exists(self) -> bool:
+        return self._root.exists()
 
-    # @property
-    # def assets_dir(self) -> Path:
-    #     # root / _relative_assets_dir
+    def is_initialized(self) -> bool:
+        return (
+            self._root.is_dir()
+            and self.recipe_path.exists()
+            and self.components_dir.is_dir()
+            and self.outputs_dir.is_dir()
+        )
 
-    # @property
-    # def images_dir(self) -> Path:
-    #     # root / _relative_images_dir
+    
+    def init(self):
+        self.root.mkdir(parents=True, exist_ok=True)
+        self.components_dir.mkdir(parents=True, exist_ok=True)
+        self.assets_dir.mkdir(parents=True, exist_ok=True)
+        self.outputs_dir.mkdir(parents=True, exist_ok=True)
+        self.build_dir.mkdir(parents=True, exist_ok=True)
+        self.temp_dir.mkdir(parents=True, exist_ok=True)
 
-    # @property
-    # def documents_dir(self) -> Path:
-    #     # root / _relative_documents_dir
+        self.recipe_path.touch(exist_ok=True)
+        self.metadata_path.touch(exist_ok=True)
 
-    # @property
-    # def spreadsheets_dir(self) -> Path:
-    #     # root / _relative_spreadsheets_dir
 
-    # @property
-    # def temp_dir(self) -> Path:
-    #     # root / _relative_temp_dir

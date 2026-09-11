@@ -23,18 +23,20 @@ class LocalResourceResolver(ResourceResolver):
         if isinstance(root, str):
             root = Path(str)
 
-        source = (
-            # Path(current.source)
-            # .parent
+        source_path = (
             root
             .joinpath(source)
             .resolve()
-            .as_posix()
         )
+
+        if not source_path.is_relative_to(root.resolve()):
+            raise ValueError("Resource escapes workspace")
+
+        
         print(root)
         print(source)
         print(current.source)
-        return source
+        return source_path.as_posix()
         # return Path(source).resolve().as_posix()
 
     def resolve(
@@ -44,14 +46,13 @@ class LocalResourceResolver(ResourceResolver):
         *,
         root: Path | str | None = None
     ) -> str:
-        # source = (
-        #     Path(current.source)
-        #     .parent
-        #     .joinpath(source)
-        #     .resolve()
-        #     .as_posix()
-        # )
-        # return source
-        # print(root)
-        current.source = self.normalize(current, source, root)
+        source_path = Path(source)
+        # Absolute
+        if source_path.is_absolute():
+            source_normalized = source            
+        # Relative
+        else:
+            source_normalized = self.normalize(current, source, root)
+        
+        current.source = source_normalized# self.normalize(current, source, root)
         return current.source

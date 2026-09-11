@@ -69,8 +69,8 @@ def test_should_raise_when_extension_is_unknown():
 # Template é sempre solvable
 def test_template_should_be_solvable():
     component = ComponentConfig(
-        type="template",
-        source="template.docx",
+        # type="template",
+        source="template.md",
     )
 
     assert component.solvable is True

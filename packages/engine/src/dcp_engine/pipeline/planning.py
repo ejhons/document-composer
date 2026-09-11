@@ -3,7 +3,9 @@ from dcp_engine.planning.graph.graph import RecipeGraph
 from dcp_engine.planning.graph.builder import RecipeGraphBuilder
 from dcp_engine.runtime.execution.session import ExecutionSession
 
-import json
+from dcp_engine.runtime.logging.logger import logger
+
+
 
 
 class PlanningModule:
@@ -19,21 +21,18 @@ class PlanningModule:
     
     def _build_graph(
         self,
-        session
+        session: ExecutionSession
     ) -> RecipeGraph:
         '''
         Creates graph, neccessary for planning operations.
         '''
+        logger.info(f'building graph...')
         return self.builder_cls(
             resource_resolver=self.resource_resolver
         ).build(
             manifest=session.manifest,
-            root=session.workspace.root
+            root=session.workspace.components_dir
         )
-        # Creates graph
-        # session.graph = graph
-
-        # return graph
         
     def execute(
             self,
@@ -44,6 +43,5 @@ class PlanningModule:
         Updates session.graph
         '''
         session.graph = self._build_graph(session)
-        print(session.workspace.root)#graph.model_dump_json())
-
+        logger.info('graph successfully build.')
         return session

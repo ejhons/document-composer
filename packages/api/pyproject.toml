@@ -9,7 +9,7 @@ dependencies = [
     "fastapi",
     "uvicorn",
     "dcp-engine",
-    "dcp-shared",
+    "dcp-application",
     "pydantic>=2.13.4",
     "python-multipart",
 ]

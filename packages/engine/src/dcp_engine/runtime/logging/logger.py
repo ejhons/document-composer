@@ -1,8 +1,4 @@
 import logging
 
-# logging.basicConfig(
-#     level=logging.INFO,
-#     format="%(asctime)s | %(levelname)s | %(message)s"
-# )
-logger = logging.getLogger('synaptic')
+logger = logging.getLogger('dcp-engine')
 logger.addHandler(logging.NullHandler())
