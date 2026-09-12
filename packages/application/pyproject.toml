@@ -1,7 +1,7 @@
 [project]
 name = "dcp-application"
 version = "0.1.0"
-description = "Add your description here"
+description = "Application-level orchestration around the DocComposer Engine.Preferred integration point for interfaces such as the CLI."
 readme = "README.md"
 authors = [{ name = "ejhons", email = "ejhons.mail@gmail.com" }]
 requires-python = ">=3.14"

@@ -13,7 +13,6 @@ from dcp_engine.solving.resolution.dependency_resolver import DependencyResolver
 from dcp_engine.solving.resolution.resolution_collector import PendingCollector
 from dcp_engine.solving.resolution.runtime_resolver import RuntimeResolver
 from dcp_engine.planning.loaders.base import ResourceResolver
-from dcp_engine.planning.loaders.resource_resolver import LocalResourceResolver
 
 @dataclass
 class EngineContext:

@@ -8,6 +8,8 @@ from dcp_engine.language.manifests.recipe import RecipeManifest
 
 # Configuração do Logger local do módulo
 logger = logging.getLogger("doc_engine.pipeline")
+
+@deprecated('Use RecipeManifest.from_file()')
 class ManifestLoader:
     """
     Orchestrates the lifecycle of document discovery, setup, assembly, 

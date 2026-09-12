@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from dcp_engine import Engine, EngineBuilder, ManifestLoader
 from dcp_api.application.compilation import CompilationService
 from dcp_api.application.files import FileRepository, FileService
-from dcp_api.application.iteraction import ExecutionSessionRepository, IterationService
+from dcp_api.application.iteraction import ExecutionSessionRepository, IteractionService
 from dcp_api.application.projects import ProjectRepository, ProjectService
 from dcp_api.application.recipes import RecipeRepository, RecipeService
 from dcp_api.infrastructure.filesystem.sessions_repository import FileExecutionSessionRepository
@@ -13,7 +13,7 @@ from dcp_api.infrastructure.filesystem.sessions_repository import FileExecutionS
 from dcp_api.infrastructure.filesystem.file_repository import (
     FilesystemFileRepository,
 )
-# from dcp_api.infrastructure.filesystem._iteration_repository import FilesystemIterationRepository
+# from dcp_api.infrastructure.filesystem._iteraction_repository import FilesystemIteractionRepository
 from dcp_api.infrastructure.filesystem.project_repository import (
     FilesystemProjectRepository,
 )
@@ -37,8 +37,8 @@ def get_file_service(request: Request) -> FileService:
 def get_recipe_service(request: Request) -> RecipeService:
     return request.app.state.container.recipe_service
 
-def get_iteration_service(request: Request) -> IterationService:
-    return request.app.state.container.iteration_service
+def get_iteraction_service(request: Request) -> IteractionService:
+    return request.app.state.container.iteraction_service
 
 def get_compilation_service(request: Request) -> CompilationService:
     return request.app.state.container.compilation_service
@@ -56,12 +56,12 @@ class ApplicationContainer:
     file_repository: FileRepository
     recipe_repository: RecipeRepository
     sessions_repository: ExecutionSessionRepository
-    # iteration_repository: IterationRepository
+    # iteraction_repository: IteractionRepository
 
     project_service: ProjectService
     file_service: FileService
     recipe_service: RecipeService
-    iteration_service: IterationService
+    iteraction_service: IteractionService
     compilation_service: CompilationService
 
 
@@ -83,7 +83,7 @@ def create_container() -> ApplicationContainer:
     project_repository = FilesystemProjectRepository(workspace)
     file_repository = FilesystemFileRepository(workspace)
     recipe_repository = FilesystemRecipeRepository(workspace)
-    # iteration_repository = FilesystemIterationRepository(workspace)
+    # iteraction_repository = FilesystemIteractionRepository(workspace)
     sessions_repository = FileExecutionSessionRepository(workspace.root)
 
     project_service = ProjectService(project_repository)
@@ -94,7 +94,7 @@ def create_container() -> ApplicationContainer:
     # ---------------------------------------------------------
     # Application services
     # ---------------------------------------------------------
-    iteration_service = IterationService(
+    iteraction_service = IteractionService(
         engine=engine,
         execution_sessions=sessions_repository,
         project_repository=project_repository
@@ -104,7 +104,7 @@ def create_container() -> ApplicationContainer:
         engine=engine,
         execution_sessions=sessions_repository,
         project_repository=project_repository,
-        # iteration_repository=iteration_repository,
+        # iteraction_repository=iteraction_repository,
         # recipe_repository=recipe_repository,
         
         # engine=engine,
@@ -118,12 +118,12 @@ def create_container() -> ApplicationContainer:
         recipe_repository=recipe_repository,
         file_repository=file_repository,
         project_repository=project_repository,
-        # iteration_repository=iteration_repository,
+        # iteraction_repository=iteraction_repository,
         sessions_repository=sessions_repository,
         project_service=project_service,
         recipe_service=recipe_service,
         file_service=file_service,
-        iteration_service=iteration_service,
+        iteraction_service=iteraction_service,
         compilation_service=compilation_service,
     )
 
@@ -145,22 +145,22 @@ def create_container() -> ApplicationContainer:
 #     )
 
 
-#     iteration_repository = (
-#         FilesystemIterationRepository(
+#     iteraction_repository = (
+#         FilesystemIteractionRepository(
 #             workspace
 #         )
 #     )
 
 
-#     iteration_service = IterationService(
-#         repository=iteration_repository,
+#     iteraction_service = IteractionService(
+#         repository=iteraction_repository,
 #         engine=engine,
 #         recipe_repository=recipe_repository,
 #     )
 
 
 #     compilation_service = CompilationService(
-#         iteration_repository=iteration_repository,
+#         iteraction_repository=iteraction_repository,
 #         recipe_repository=recipe_repository,
 #         engine=engine,
 #         compiler_registry=compiler_registry,
@@ -172,8 +172,8 @@ def create_container() -> ApplicationContainer:
 #         workspace=workspace,
 #         engine=engine,
 #         recipe_repository=recipe_repository,
-#         iteration_repository=iteration_repository,
-#         iteration_service=iteration_service,
+#         iteraction_repository=iteraction_repository,
+#         iteraction_service=iteraction_service,
 #         compilation_service=compilation_service,
 #     )
 

@@ -1,10 +1,13 @@
+import os
+import json
 from enum import StrEnum
 from pathlib import Path
-
-from pydantic import BaseModel, Field, model_validator
 from typing import Any, List, Literal, Optional
+from pydantic import BaseModel, Field, model_validator
 
-from dcp_engine.common.generator import IdGenerator
+from dcp_engine.runtime.logging.log import logger
+
+# logger = logging.getLogger("doc_engine.pipeline")
 
 class DependencyReference(BaseModel):
     expression: str
@@ -20,10 +23,27 @@ class RecipeManifest(BaseModel):
     recipe_name: str
     version: str
     style: StyleConfig
-    components: List[ComponentConfig] = Field(default_factory=list)
     inputs: dict[str, Any] = Field(default_factory=dict)
-    # Adicionamos o formato de saída padrão do documento (docx ou pdf)
+    components: List[ComponentConfig] = Field(default_factory=list)
     target_format: Literal["docx", "pdf", "html", "md"] = Field(default="docx")
+
+    @classmethod
+    def from_file(
+        cls,
+        manifest_path: str
+    ) -> RecipeManifest:
+        
+        if not os.path.exists(manifest_path):
+            logger.error(f"Assembly recipe manifest not found at: {manifest_path}")
+            raise FileNotFoundError(f"Recipe manifest missing: {manifest_path}")
+                
+        with open(manifest_path, 'r', encoding='utf-8') as file:
+            raw_data = json.load(file)
+
+        generated_manifest = cls(**raw_data)
+
+        return generated_manifest
+    
 
 class ComponentType(StrEnum):
     INTERNAL = 'internal'

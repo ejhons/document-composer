@@ -13,11 +13,13 @@ class StaticCacheManager:
     """
     def __init__(self, registry:dict = {}):
         self.registry = registry
+
     
     @staticmethod
     def calculate_text_hash(text: str) -> str:
         """Generates a unique SHA256 checksum string for raw text strings (e.g., Mermaid blocks)."""
         return hashlib.sha256(text.encode('utf-8')).hexdigest()
+
 
     def is_cached(
         self,
@@ -36,11 +38,6 @@ class StaticCacheManager:
         # Check if hash values match perfectly
         if cached_entry.get("hash") != current_hash:
             return False
-            
-        # Check if files generated in previous run were not deleted
-        # for file_path in expected_outputs:
-        #     if not os.path.exists(file_path):
-        #         return False
                 
         return True
 
@@ -55,7 +52,6 @@ class StaticCacheManager:
             "hash": current_hash,
             "outputs": outputs
         }
-        # self._save_registry()
 
 
 class CacheManager:

@@ -1,7 +1,12 @@
 import os
 from pathlib import Path
 
-from pydantic import BaseModel, PrivateAttr
+from pydantic import BaseModel, Field, PrivateAttr
+
+from dcp_engine.common.generator import IdGenerator
+from dcp_engine.language.manifests.recipe import RecipeManifest
+from dcp_engine.runtime.execution.metadata import Metadata
+from dcp_engine.runtime.logging.log import logger
 
 
 class Workspace(BaseModel):
@@ -10,6 +15,9 @@ class Workspace(BaseModel):
     Project of document composition.
     '''
     root: Path
+    id: str = Field(default_factory=lambda:
+        IdGenerator.generate('w')
+    )
 
     # Atributos privados com valores padrão (Pydantic v2)
     _recipe_name: str = PrivateAttr('recipe.json')
@@ -71,17 +79,15 @@ class Workspace(BaseModel):
         filename = self._generated_name + '.' + extension
         return self.outputs_dir / filename 
 
-    # @property
-    # def components_path(self) -> Path:
-    #     return self.root / "components"
 
-    # @property
-    # def assets_path(self) -> Path:
-    #     return self.root / "assets"
+    def load_recipe(self) -> RecipeManifest:
+        recipe = RecipeManifest.from_file(self.recipe_path)
+        return recipe
+    
+    def reload_metadata(self) -> Metadata:
+        metadata =  Metadata.from_json_file(self.metadata_path)
+        return metadata
 
-    # @property
-    # def output_path(self) -> Path:
-    #     return self.root / "output"
     
 
     def dir_from_root(
@@ -148,5 +154,6 @@ class Workspace(BaseModel):
 
         self.recipe_path.touch(exist_ok=True)
         self.metadata_path.touch(exist_ok=True)
+        logger.info(f'Workspace created in "{self.root}"')
 
 

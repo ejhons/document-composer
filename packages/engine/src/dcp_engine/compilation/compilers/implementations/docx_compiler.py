@@ -5,6 +5,7 @@ from docx import Document
 from dcp_engine.compilation.compilers.base import BaseCompiler
 from dcp_engine.language.manifests.recipe import RecipeManifest
 from dcp_engine.runtime.execution.session import ExecutionSession
+from dcp_engine.runtime.logging.log import logger
 
 
 class DocxCompiler(BaseCompiler):
@@ -38,7 +39,7 @@ class DocxCompiler(BaseCompiler):
         if reference_path and os.path.exists(reference_path):
             extra_args.append(f"--reference-doc={reference_path}")
         else:
-            print(f"[Style Warning] reference.docx não configurado. Para cabeçalhos nativos no Word, forneça um arquivo base estilizado.")
+            logger.warning(f"[Style Warning] reference.docx não configurado. Para cabeçalhos nativos no Word, forneça um arquivo base estilizado.")
 
         pypandoc.convert_file(
             source_file=source_markdown_path,

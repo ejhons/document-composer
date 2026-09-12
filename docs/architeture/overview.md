@@ -19,7 +19,7 @@ O fluxo é dividido em 4 etapas bem definidas:
 Eles serão tratados nativamente pelo formato Markdown e convertidos na fase de compilação:
 **Equações**: Escritas em sintaxe padrão LaTeX (ex: $$ E = mc^2 $$). O compilador final renderiza essas fórmulas perfeitamente no Word ou PDF.
 **Diagramas**: Escritos em blocos de código Mermaid (sintaxe baseada em texto). Durante a compilação, uma extensão do Pandoc (ou uma biblioteca auxiliar) converte o código de texto do diagrama em uma imagem vetorial estática inserida diretamente no documento final.
-**Imagens**: Inseridas via links de referência relativos padrões do Markdown (![Legenda](caminho/foto.jpg)).
+**Imagens**: Inseridas via links de referência relativos padrões do Markdown (![Legenda](caminho/foto.png)).
 **Tabelas**:
 
 ### How would the components be organized for compousing the final document?

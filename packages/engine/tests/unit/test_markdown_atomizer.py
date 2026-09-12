@@ -48,8 +48,8 @@ def test_atomizer_must_return_atomized_markdown():
 
     atomized = atomizer.atomize(markdown=markdown)
 
-    print(len(atomized.blocks))
-    pprint(atomized.model_dump())
+    # print(len(atomized.blocks))
+    # pprint(atomized.model_dump())
 
     assert len(atomized.blocks) == 7
     # assert None

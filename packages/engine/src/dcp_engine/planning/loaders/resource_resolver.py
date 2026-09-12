@@ -32,10 +32,6 @@ class LocalResourceResolver(ResourceResolver):
         if not source_path.is_relative_to(root.resolve()):
             raise ValueError("Resource escapes workspace")
 
-        
-        print(root)
-        print(source)
-        print(current.source)
         return source_path.as_posix()
         # return Path(source).resolve().as_posix()
 

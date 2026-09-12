@@ -1,7 +1,7 @@
 [project]
 name = "dcp-engine"
 version = "0.1.0"
-description = "Add your description here"
+description = "Core document-processing library of the DocComposer project."
 readme = "README.md"
 authors = [{ name = "ejhons", email = "ejhons.mail@gmail.com" }]
 requires-python = ">=3.14"

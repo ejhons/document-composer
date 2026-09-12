@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Any
 
 
-class IterationStatus(str, Enum):
+class IteractionStatus(str, Enum):
     NEEDS_INPUT='needs_input'
     READY = "ready"
 
@@ -28,12 +28,12 @@ class PendingResolutionDomain:
 
 
 # @dataclass(slots=True)
-# class IterationSession:
+# class IteractionSession:
 
 #     id: str
 #     project_id: str
 
-#     status: IterationStatus = IterationStatus.PENDING
+#     status: IteractionStatus = IteractionStatus.PENDING
 #     variables: dict[str, Any] = field(default_factory=dict)
 #     pending: list[PendingResolution] = field(default_factory=list)
 
@@ -57,7 +57,7 @@ class PendingResolutionDomain:
 #         self.pending = pending
 
 #         self.status = (
-#             IterationStatus.READY
+#             IteractionStatus.READY
 #             if self.is_ready()
-#             else IterationStatus.PENDING
+#             else IteractionStatus.PENDING
 #         )

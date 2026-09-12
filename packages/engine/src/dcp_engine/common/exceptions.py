@@ -1,20 +1,24 @@
-class BaseDocException(Exception):
+class BaseDcpException(Exception):
     pass
 
-class NodeAlreadyRegistered(BaseDocException):
+class GraphNotSolvedException(BaseDcpException):
     pass
 
-class NodeNotFoundException(BaseDocException):
+class WorkspaceNotDefinedException(BaseDcpException):
     pass
 
-class ResolutionException(BaseDocException):
+class NodeAlreadyRegistered(BaseDcpException):
     pass
 
-class DownloadException(BaseDocException):
+class NodeNotFoundException(BaseDcpException):
     pass
 
-class GraphNotSolvedException(BaseDocException):
+class ResolutionException(BaseDcpException):
     pass
 
-class ContentNotAvaliable(BaseDocException):
+class DownloadException(BaseDcpException):
+    pass
+
+
+class ContentNotAvaliable(BaseDcpException):
     pass

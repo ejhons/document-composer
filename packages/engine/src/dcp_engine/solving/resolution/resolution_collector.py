@@ -1,5 +1,5 @@
 from dataclasses import field
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from dcp_engine.language.syntax.fields import InputDefinition
 from dcp_engine.planning.graph.component_node import ComponentNode
@@ -144,17 +144,17 @@ class PendingCollector:
                 resolution.pending_dependencies.add(dependency_id)
 
 class PendingItem(BaseModel):
-    inputs: set[str]
-    dependencies: set[str]
+    inputs: set[str] = Field(default_factory=set)
+    dependencies: set[str] = Field(default_factory=set)
 
 class PendingResolution(BaseModel):
     resolved: bool
     unchanged: bool
-    input_definitions: dict[str, InputDefinition] = field(default_factory=dict)
-    pending:dict[str, PendingItem] = field(default_factory=dict)
+    pending:dict[str, PendingItem] = Field(default_factory=dict)
+    input_definitions: dict[str, InputDefinition] = Field(default_factory=dict)
 
     @property
-    def pending_inputs(self) -> set[str]:
+    def unique_pending_variables(self) -> set[str]:
         return { item for p in self.pending.values() for item in p.inputs}
 
     @property
@@ -163,10 +163,14 @@ class PendingResolution(BaseModel):
 
 
     @property
-    def pending_inputs_definition(self) -> dict[str, InputDefinition]:
+    def pending_input_definitions(self) -> dict[str, InputDefinition]:
+        '''
+        Retunrs definition of used inputs still pending.
+        '''
         return {
-            key: self.input_definitions.get(key)
-            for key in self.pending_inputs
+            var: self.input_definitions[var]
+            for var in self.unique_pending_variables
+            if var in self.input_definitions
         }
     
     # pending_inputs: dict[str, PendingInput] = Field(default_factory=dict)

@@ -1,882 +1,526 @@
-# Document Composer
+# DocComposer
 
-> **Engine modular para composição, resolução e compilação de documentos a partir de componentes reutilizáveis.**
+> A local-first document composition and compilation framework for building complex documents from declarative recipes and reusable components.
 
-O **Document Composer** é um motor de composição documental desenvolvido em Python para transformar um conjunto de componentes heterogêneos — como Markdown, templates, planilhas, imagens e diagramas — em documentos finais nos formatos **PDF, DOCX e HTML**.
+DocComposer is a Python-based document composition system designed to transform structured **recipes**, reusable document components, templates, data inputs, and external resources into final documents such as **HTML, PDF, and DOCX**.
 
-O projeto foi concebido para separar claramente as responsabilidades de **inspeção, resolução de dependências, composição e compilação**, permitindo que novos tipos de componentes e formatos de saída sejam incorporados sem modificar o núcleo da aplicação.
-
----
-
-## Sumário
-
-* [Visão geral](#visão-geral)
-* [Problema](#problema)
-* [Conceito](#conceito)
-* [Arquitetura](#arquitetura)
-* [Pipeline de execução](#pipeline-de-execução)
-* [Manifesto de composição](#manifesto-de-composição)
-* [Componentes](#componentes)
-* [Resolução de dependências](#resolução-de-dependências)
-* [Análise estática](#análise-estática)
-* [Adaptadores](#adaptadores)
-* [Compiladores](#compiladores)
-* [Extensibilidade](#extensibilidade)
-* [Formatos suportados](#formatos-suportados)
-* [Princípios arquiteturais](#princípios-arquiteturais)
-* [Portabilidade](#portabilidade)
-* [Estado atual](#estado-atual)
-* [Próximos passos](#próximos-passos)
+The project separates document planning, dependency resolution, document assembly, and final compilation into explicit stages. This makes the composition process predictable, extensible, and suitable for both interactive and automated workflows.
 
 ---
 
-## Visão geral
+## Features
 
-A ideia central do Document Composer é tratar um documento não como um arquivo monolítico, mas como uma **composição de componentes independentes**.
+* Declarative document composition through recipe manifests
+* Reusable document components
+* Jinja-based template rendering
+* Static dependency inspection before execution
+* Interactive resolution of missing inputs and dependencies
+* Dependency-aware execution using a LIFO task scheduler
+* Nested component resolution
+* Support for internal and external resources
+* Pluggable adapters and compilers
+* HTML, PDF, and DOCX compilation
+* Local filesystem-based workspaces
+* Python API for programmatic usage
+* Command-line interface for end users
+* Extensible architecture based on dependency inversion and polymorphism
 
-Um documento pode, por exemplo, ser definido por:
-
-```text
-Documento
-├── introducao.md
-├── metodologia.md
-├── resultados.md
-├── tabela_resultados.xlsx
-├── figura.png
-└── diagrama.mermaid
-```
-
-Esses componentes podem possuir relações entre si.
-
-Um template Markdown pode depender de uma planilha Excel:
-
-```text
-relatorio.md
-    │
-    └── tabela_resultados.xlsx
-```
-
-E essa planilha pode, por sua vez, participar de uma composição mais complexa.
-
-O Composer resolve essas relações antes de produzir o documento final.
-
-A saída do processo é um documento compilado:
-
-```text
-Recipe Manifest
-       │
-       ▼
-Static Inspection
-       │
-       ▼
-Dependency Resolution
-       │
-       ▼
-Document Assembly
-       │
-       ▼
-Unified Markdown
-       │
-       ├──────► HTML
-       ├──────► PDF
-       └──────► DOCX
-```
+The core engine is intentionally independent from the delivery layer. The web API and frontend are separate concerns and are not part of the current usage model.
 
 ---
 
-# Problema
+## Architecture
 
-Sistemas tradicionais de geração documental normalmente começam com um template monolítico e acumulam lógica de composição ao longo do tempo.
-
-Isso cria problemas como:
-
-* dependências entre templates;
-* processamento de arquivos externos;
-* inclusão de tabelas e imagens;
-* diagramas incorporados;
-* condicionais;
-* múltiplos formatos de saída;
-* regras específicas para cada formato;
-* acoplamento entre componentes;
-* dificuldade para reutilizar partes de documentos.
-
-O Document Composer busca resolver esse problema através de uma arquitetura na qual **componentes não precisam conhecer diretamente uns aos outros**.
-
-A Engine funciona como o elemento coordenador responsável por resolver essas relações.
-
----
-
-# Conceito
-
-O projeto adota uma separação fundamental entre:
-
-### 1. Componentes
-
-São os recursos que participam da composição:
+DocComposer processes a document through four major stages:
 
 ```text
-Markdown
-Excel
-Imagem
-Mermaid
-PDF
-DOCX
-...
-```
-
-### 2. Inspeção
-
-Determina previamente o que um componente necessita.
-
-### 3. Resolução
-
-Resolve variáveis e dependências entre componentes.
-
-### 4. Montagem (Assembly)
-
-Combina os componentes resolvidos em uma representação documental intermediária.
-
-### 5. Compilação
-
-Transforma a representação final no formato desejado.
-
-Essa separação permite que a composição documental seja independente do formato de saída.
-
----
-
-# Arquitetura
-
-A arquitetura atual do Core está organizada em três grandes responsabilidades:
-
-```text
-                    ┌─────────────────────┐
-                    │   Recipe Manifest   │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │   Static Analysis   │
-                    │     Inspectors      │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │   Dependency /      │
-                    │ Runtime Resolution  │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │   Document Engine   │
-                    │     Scheduler       │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │ Document Assembly   │
-                    │ Unified Markdown    │
-                    └──────────┬──────────┘
-                               │
-                ┌──────────────┼──────────────┐
-                ▼              ▼              ▼
-             ┌─────┐        ┌─────┐        ┌─────┐
-             │ HTML│        │ PDF │        │DOCX │
-             └─────┘        └─────┘        └─────┘
-```
-
-O núcleo deixou de ser um simples pipeline linear e passou a operar como uma **máquina de estados com pilha de execução**.
-
----
-
-# Pipeline de execução
-
-O ciclo de vida de uma composição pode ser resumido em:
-
-```text
-1. Carregar Manifest
-        │
-        ▼
-2. Inspecionar componentes
-        │
-        ▼
-3. Criar tarefas
-        │
-        ▼
-4. Resolver dependências
-        │
-        ▼
-5. Executar componentes
-        │
-        ▼
-6. Montar documento
-        │
-        ▼
-7. Gerar Markdown unificado
-        │
-        ▼
-8. Compilar
-        │
-        ▼
-9. Artefato final
-```
-
-O pipeline externo recebe a receita e os inputs, chama a Engine para realizar a composição e, posteriormente, seleciona o compilador correspondente ao formato solicitado.
-
----
-
-# Máquina de estados
-
-Um dos principais avanços arquiteturais do projeto foi substituir o processamento linear por um **TaskScheduler baseado em pilha LIFO**.
-
-O scheduler mantém:
-
-```text
-stack
-registry
-```
-
-A `stack` representa as tarefas pendentes de execução.
-
-O `registry` mantém o estado das tarefas já processadas.
-
-Isso permite lidar com dependências profundas:
-
-```text
-Markdown A
-   │
-   └── Excel B
-          │
-          └── Mermaid C
-```
-
-O processamento ocorre aproximadamente assim:
-
-```text
-A entra na stack
+┌────────────┐
+│  Planning  │
+└─────┬──────┘
       │
       ▼
-A é executado
+┌────────────┐
+│  Solving   │◄──── User/Application input
+└─────┬──────┘
       │
       ▼
-A descobre B
+┌────────────┐
+│ Assembling │
+└─────┬──────┘
       │
       ▼
-B entra na stack
+┌────────────┐
+│ Compilation│
+└─────┬──────┘
       │
       ▼
-B é executado
-      │
-      ▼
-B descobre C
-      │
-      ▼
-C entra na stack
-      │
-      ▼
-C é resolvido
-      │
-      ▼
-B é concluído
-      │
-      ▼
-A continua
+ Final Document
 ```
 
-Para dependências descobertas durante a execução, a Engine utiliza marcadores intermediários como:
+### Planning
 
-```html
-<!-- WAIT_FOR:id -->
-```
+Planning inspects the recipe and its components before document execution.
 
-O componente original pode então ser retomado depois que suas dependências forem concluídas.
+The static inspection layer identifies information such as:
+
+* template variables;
+* file dependencies;
+* embedded resources;
+* supported component-specific constructs;
+* Mermaid blocks and other structural elements.
+
+The inspection process is designed to be free of execution side effects.
+
+### Solving
+
+Solving resolves the requirements identified during planning.
+
+A document does not have to be completely resolvable in a single operation. The engine can return a structured representation of what is still pending, allowing an application or user interface to provide the missing information and continue the same session.
+
+### Assembling
+
+Once all required information is available, the engine resolves the component dependency graph and produces the final assembled document representation.
+
+Nested dependencies are supported. A component may discover additional components during processing, which are scheduled and resolved before the parent component is completed.
+
+### Compilation
+
+The assembled document is passed to a compiler for the requested output format.
+
+Currently supported output formats include:
+
+* HTML
+* PDF
+* DOCX
+
+Compilation only takes place after the document has been completely resolved.
 
 ---
 
-# Manifesto de composição
+## Dependency Resolution
 
-A composição de um documento é orientada por uma **Recipe Manifest**.
+DocComposer uses a dependency-aware execution model rather than a simple sequential loop.
 
-O manifesto descreve a receita do documento e seus componentes.
+The `TaskScheduler` maintains an execution stack and completed-task registry. When a component discovers a dependency, that dependency is scheduled before the parent component continues.
 
-Conceitualmente:
-
-```json
-{
-  "recipe_name": "technical_report",
-  "version": "1.0",
-  "target_format": "pdf",
-  "style": "default",
-  "components": [
-    {
-      "id": "introduction",
-      "type": "template",
-      "source": "introduction.md",
-      "file_format": "md",
-      "is_required": true
-    },
-    {
-      "id": "results",
-      "type": "external",
-      "source": "results.xlsx",
-      "file_format": "xlsx",
-      "is_required": true
-    }
-  ]
-}
-```
-
-A receita funciona como uma declaração da composição, enquanto a Engine é responsável por determinar **como executar essa composição**.
-
----
-
-# Componentes
-
-Os componentes são tratados através de configurações que descrevem sua origem e características.
-
-Entre os formatos trabalhados pelo projeto estão:
-
-* Markdown;
-* Excel;
-* imagens;
-* Mermaid;
-* PDF;
-* DOCX.
-
-O objetivo da arquitetura é evitar que o núcleo precise conhecer detalhes específicos de cada formato.
-
-Em vez disso, componentes são processados através de adaptadores especializados.
-
----
-
-# Resolução de dependências
-
-Uma característica importante do Composer é a possibilidade de um componente solicitar outro componente durante sua própria resolução.
-
-Por exemplo:
-
-```markdown
-# Resultados
-
-{{ incluir_tabela("resultados.xlsx") }}
-
-Os resultados demonstram...
-```
-
-O Markdown não precisa conhecer diretamente o adaptador Excel.
-
-A Engine fornece um mecanismo intermediário:
-
-```text
-MarkdownTemplateAdapter
-          │
-          │ external_resolver()
-          ▼
-      DocumentEngine
-          │
-          ▼
-      Excel Adapter
-```
-
-Esse mecanismo utiliza **Inversão de Controle (IoC)** para impedir que adaptadores se tornem diretamente dependentes uns dos outros.
-
----
-
-# Análise estática
-
-Antes da execução completa, o Composer possui uma camada de **Static Analysis**.
-
-O objetivo é descobrir dependências sem executar o documento.
-
-O método:
-
-```python
-identify_dependencies()
-```
-
-permite analisar componentes previamente e identificar elementos como:
-
-* variáveis Jinja;
-* referências a arquivos;
-* funções de inclusão;
-* blocos Mermaid;
-* possíveis dependências externas.
-
-O `GenericMarkdownInspector` utiliza análise estrutural baseada em expressões regulares.
-
-Uma propriedade importante dessa etapa é:
-
-> **A inspeção não executa o componente e não produz efeitos colaterais.**
-
-A análise é registrada através do `StaticInspectorRegistry`, permitindo que novos inspectores sejam adicionados sem alterar o núcleo.
-
----
-
-# Adaptadores
-
-Os adaptadores representam a camada responsável por transformar componentes individuais.
-
-A arquitetura utiliza abstrações como:
-
-```text
-BaseAdapter
-    │
-    ├── MarkdownTemplateAdapter
-    ├── Excel Adapter
-    ├── Mermaid Adapter
-    └── ...
-```
-
-Cada adaptador conhece seu próprio formato.
-
-A Engine, por outro lado, não precisa implementar regras específicas de cada componente.
-
----
-
-## MarkdownTemplateAdapter
-
-Responsável por:
-
-* processar templates Markdown;
-* resolver Jinja;
-* trabalhar com conteúdo inline;
-* identificar/processar Mermaid incorporado;
-* solicitar recursos externos através do `external_resolver`.
-
-O adaptador não possui uma dependência direta com o adaptador Excel.
-
-Essa decisão reduz significativamente o acoplamento da arquitetura.
-
----
-
-# Compiladores
-
-Após a composição, o sistema possui um Markdown unificado que pode ser direcionado para diferentes compiladores.
-
-A arquitetura segue o princípio:
-
-```text
-                    Unified Markdown
-                           │
-                    Compiler Registry
-                           │
-             ┌─────────────┼─────────────┐
-             ▼             ▼             ▼
-        HTML Compiler PDF Compiler DOCX Compiler
-```
-
-A seleção do compilador ocorre através de um registry.
-
-Assim, adicionar um novo formato não exige alterar o fluxo principal da Engine.
-
----
-
-## HTML
-
-A saída HTML é produzida a partir do documento consolidado, utilizando a infraestrutura de conversão baseada em Pandoc.
-
----
-
-## PDF
-
-A estratégia de geração de PDF passou por uma mudança importante.
-
-Inicialmente havia dependência de:
-
-```text
-LaTeX
-WeasyPrint
-GTK/GObject
-```
-
-Essas dependências introduziam problemas de portabilidade.
-
-A implementação atual utiliza:
+For example:
 
 ```text
 Markdown
    │
-   ▼
-Pandoc
+   ├── Excel
    │
-   ▼
-HTML controlado
-   │
-   ▼
-xhtml2pdf / ReportLab
-   │
-   ▼
-PDF
+   └── Mermaid
 ```
 
-O `xhtml2pdf` foi escolhido para eliminar a necessidade de runtimes externos como GTK/GObject.
+The Markdown component can be temporarily suspended while its dependencies are resolved.
 
-Também foi criado um template HTML controlado para evitar que o CSS gerado pelo Pandoc introduzisse seletores incompatíveis com o mecanismo de conversão PDF.
-
----
-
-## DOCX
-
-A geração de DOCX utiliza Pandoc, mas possui uma particularidade importante.
-
-A lógica de merge estrutural de subdocumentos foi retirada do pipeline e incorporada ao:
-
-```text
-DocxCompilerAdapter
-```
-
-O compilador recebe suas dependências através de injeção de dependência, incluindo o `AdapterRegistry`.
-
-Isso mantém as regras específicas do Word dentro do componente que realmente conhece o formato.
-
----
-
-# Mermaid
-
-O suporte a Mermaid foi integrado à arquitetura de componentes.
-
-Um diagrama pode existir como componente independente:
-
-```text
-diagram.mermaid
-```
-
-ou aparecer embutido dentro de um documento:
-
-````markdown
-```mermaid
-graph TD
-    A --> B
-```
-````
-
-O processamento deixou de depender de uma varredura global feita pela Engine e passou a ser tratado através da arquitetura de adaptadores.
-
----
-
-# Excel
-
-Planilhas podem participar da composição documental como recursos externos.
-
-Um template pode solicitar uma tabela durante sua resolução:
+This mechanism also supports deeper dependency chains:
 
 ```text
 Markdown
-   │
-   └── include Excel
-          │
-          ▼
-       Adapter
-          │
-          ▼
-   conteúdo documental
+   └── Excel
+        └── Graph
+             └── Resource
 ```
 
-A resolução é intermediada pela Engine, evitando que:
+The execution model is based on a LIFO stack and allows unresolved parent tasks to return to the execution cycle after their dependencies have been completed.
+
+---
+
+## Workspace
+
+A workspace represents the physical directory associated with a DocComposer project.
+
+A typical workspace may look like:
 
 ```text
-MarkdownAdapter → ExcelAdapter
+my-document/
+├── metadata.json
+├── recipe.json
+├── components/
+└── output/
 ```
 
-se torne uma dependência rígida.
+The exact contents depend on the recipe and project configuration.
+
+The workspace is responsible for providing access to project resources such as:
+
+* recipe;
+* metadata;
+* components;
+* generated output.
+
+Resources referenced with relative paths are resolved against the workspace. Absolute paths can be used to reference external resources.
+
+This allows reusable resources to live outside a specific project workspace without introducing a separate component model.
 
 ---
 
-# Arquitetura orientada a extensibilidade
+## Recipe-Based Composition
 
-Um dos objetivos centrais do projeto é permitir que novas capacidades sejam adicionadas através de registries e abstrações.
+A document is described by a recipe.
 
-Exemplos:
+Conceptually, a recipe defines:
 
 ```text
-AdapterRegistry
-CompilerRegistry
-StaticInspectorRegistry
+Recipe
+├── identity
+├── version
+├── target format
+├── style
+└── components
 ```
 
-Isso permite uma arquitetura aberta para extensão:
+Components can represent different types of document content, including Markdown templates, spreadsheets, images, diagrams, and other supported resources.
+
+A component can also reference other components or external resources.
+
+---
+
+## Templates
+
+Markdown templates can use Jinja-style expressions:
+
+```jinja2
+# {{ title }}
+
+Prepared for {{ author }}.
+
+The total estimated cost is {{ total_cost }}.
+```
+
+During planning, template variables can be identified before rendering.
+
+During solving, the application provides the values required by the template.
+
+Only after all required values have been resolved does the template become part of the final assembled document.
+
+---
+
+## Embedded Content
+
+DocComposer supports content that is embedded inside another document component.
+
+For example, a Markdown document can request content generated from another resource:
 
 ```text
-Novo formato
-    │
-    ├── Inspector
-    ├── Adapter
-    └── Compiler
+Markdown
+    ↓
+Excel component
+    ↓
+Generated Markdown representation
 ```
 
-sem necessidade de transformar a Engine em um conjunto crescente de condicionais.
+Mermaid diagrams can also be handled as standalone components or embedded inside text content.
+
+The engine mediates these interactions without requiring individual adapters to depend directly on one another.
 
 ---
 
-# Princípios arquiteturais
+## Compilation
 
-O desenvolvimento do Core foi guiado principalmente pelos seguintes princípios:
+The compilation layer converts the assembled representation into the requested output format.
 
-### Single Responsibility
+### HTML
 
-Cada componente possui uma responsabilidade específica.
+Produces a standalone HTML document.
 
-A Engine coordena.
+### PDF
 
-O Scheduler agenda.
+The current PDF pipeline uses an HTML intermediary and `xhtml2pdf`/ReportLab-based rendering, avoiding the need for LaTeX or GTK/GObject runtimes.
 
-Os Inspectors analisam.
+### DOCX
 
-Os Adapters transformam componentes.
-
-Os Compilers produzem formatos finais.
+DOCX generation is handled by a dedicated compiler adapter. Structural merging of generated Word subdocuments is encapsulated inside the DOCX compiler rather than in the orchestration layer.
 
 ---
 
-### Open/Closed Principle
+## Installation
 
-Novos formatos e comportamentos devem ser adicionados através de extensões, não através da modificação do fluxo central.
+### From source
+
+Clone the repository and install the project in editable mode:
+
+```bash
+git clone <repository-url>
+cd doccomposer
+
+pip install -e .
+```
+
+For development dependencies:
+
+```bash
+pip install -e ".[dev]"
+```
+
+> Replace the package extras above if the project defines a different development dependency group.
+
+### Requirements
+
+DocComposer requires a supported Python installation according to the project's `pyproject.toml`.
+
+The exact runtime dependencies should be installed through the package manager rather than manually.
+
+Some output workflows may also rely on external executables, particularly Pandoc. Verify the installation requirements of the selected compiler before using a format that depends on them.
 
 ---
 
-### Dependency Inversion
+## Command-Line Usage
 
-Dependências concretas são injetadas através de abstrações e registries.
+The recommended end-user interface is the `doc-compose` command.
+
+From a project workspace:
+
+```bash
+dcp build
+```
+
+A different workspace can be supplied explicitly:
+
+```bash
+dcp build /path/to/project
+```
+
+The output format can be selected with:
+
+```bash
+dcp build --format pdf
+```
+
+or:
+
+```bash
+doc-compose build -f pdf
+```
+
+The verbosity of logs can be changed with:
+
+```bash
+dcp build --verbose
+```
+
+or:
+
+```bash
+dcp build -v
+```
+
+The CLI starts an interaction session, resolves pending requirements, and only then compiles the final document.
 
 ---
 
-### Inversion of Control
+## Python Usage
 
-Um exemplo é o:
+DocComposer can also be used directly from Python.
+
+The recommended architecture is to construct the engine and application services through the project's composition layer rather than instantiating individual internal components unnecessarily.
+
+Conceptually:
 
 ```python
-external_resolver
-```
+from dcp_engine import Engine
 
-injetado no `MarkdownTemplateAdapter`.
-
-Isso permite que componentes permaneçam independentes entre si.
-
----
-
-# Portabilidade
-
-Um dos objetivos técnicos mais importantes do projeto foi reduzir dependências externas do sistema operacional.
-
-A arquitetura atual evita depender diretamente de instalações globais como:
-
-```text
-pdflatex
-GTK
-GObject
-```
-
-O processamento foi direcionado para bibliotecas Python e ferramentas controladas pelo próprio pipeline.
-
-Isso torna o Core significativamente mais portátil entre ambientes.
-
----
-
-# Estrutura conceitual
-
-O Core pode ser compreendido através das seguintes camadas:
-
-```text
-doc_engine/
-│
-├── core/
-│   │
-│   ├── engine
-│   │     └── DocumentEngine
-│   │
-│   ├── scheduler
-│   │     └── TaskScheduler
-│   │
-│   ├── inspectors
-│   │     └── StaticInspectorRegistry
-│   │
-│   ├── adapters
-│   │     ├── BaseAdapter
-│   │     ├── MarkdownTemplateAdapter
-│   │     └── ...
-│   │
-│   └── compilers
-│         ├── BaseCompilerAdapter
-│         ├── PdfCompilerAdapter
-│         ├── DocxCompilerAdapter
-│         └── ...
-│
-└── ...
-```
-
-A estrutura exata do repositório pode evoluir conforme as camadas de aplicação e entrega sejam adicionadas.
-
----
-
-# Exemplo conceitual de execução
-
-Uma aplicação cliente poderia fornecer:
-
-```python
-engine = DocumentEngine(...)
-
-result = engine.assemble_document(
-    manifest=manifest,
-    variables={
-        "project_name": "Project X",
-        "author": "Everton"
-    }
+engine = Engine(
+    planning=planning,
+    solving=solving,
+    assembling=assembling,
+    compilation=compilation,
 )
+
+workspace = engine.init_workspace("./my-project")
+session = engine.create_session(workspace)
 ```
 
-A Engine então:
+The exact constructors and factories are part of the package API and may evolve independently from the CLI.
+
+---
+
+## Interaction Model
+
+Document generation is intentionally iterative.
+
+A typical application flow is:
 
 ```text
-Manifest
-   │
-   ▼
-Tasks
-   │
-   ▼
-Static inspection
-   │
-   ▼
-Scheduler
-   │
-   ├── Markdown
-   │      │
-   │      └── Excel
-   │             │
-   │             └── Mermaid
-   │
-   ▼
-Resolved components
-   │
-   ▼
-Assembled Markdown
-   │
-   ▼
-Compiler
-   │
-   ▼
-Final artifact
+Start Session
+      │
+      ▼
+   Planning
+      │
+      ▼
+    Solving
+      │
+      ├── Pending inputs? ──► Provide values
+      │                           │
+      │                           └──────┐
+      ▼                                  ▼
+      └────────────────────────────── Solving
+                                         │
+                                         ▼
+                                      Resolved
+                                         │
+                                         ▼
+                                     Assembling
+                                         │
+                                         ▼
+                                     Compiling
+```
+
+This is important for applications that cannot provide all document inputs at once.
+
+The solving stage returns structured pending information instead of assuming that every document can be completed immediately.
+
+---
+
+## Project Structure
+
+The project is organized around independent packages:
+
+```text
+DocComposer
+│
+├── Engine
+│   └── Document composition and compilation core
+│
+├── Application
+│   └── Application use cases and interaction orchestration
+│
+└── CLI
+    └── Command-line interface
+```
+
+The dependency direction is intentionally one-way:
+
+```text
+CLI
+ │
+ ▼
+Application
+ │
+ ▼
+Engine
+```
+
+The Engine does not depend on the CLI.
+
+The Application layer coordinates use cases without becoming responsible for document-processing internals.
+
+The CLI is responsible for translating terminal interaction into application operations.
+
+---
+
+## Design Principles
+
+DocComposer follows a small set of architectural principles:
+
+### Separation of concerns
+
+Planning, solving, assembling, and compiling have distinct responsibilities.
+
+### Dependency inversion
+
+Concrete adapters and compilers are injected into the engine instead of being hard-coded into orchestration logic.
+
+### Polymorphism
+
+Component and compiler behavior is selected through registries and interfaces rather than large conditional branches.
+
+### Side-effect isolation
+
+Static inspection should be able to analyze a component without executing its runtime behavior.
+
+### Explicit state
+
+Execution state belongs to the `ExecutionSession`, rather than being hidden inside global objects.
+
+### Extensibility
+
+New component types and output formats should be introduced by implementing the appropriate adapter/compiler contracts.
+
+---
+
+## Error Handling
+
+DocComposer defines project-specific exceptions derived from a common base exception.
+
+Examples include:
+
+* `NodeAlreadyRegistered`
+* `NodeNotFoundException`
+* `ResolutionException`
+* `DownloadException`
+* `GraphNotSolvedException`
+* `ContentNotAvaliable`
+
+Applications should catch the most specific exception they can meaningfully handle.
+
+In particular, compilation should not be attempted while the dependency graph remains unresolved.
+
+---
+
+## Development
+
+Install the project in editable mode with development dependencies:
+
+```bash
+pip install -e ".[dev]"
+```
+
+Run the test suite using the project's configured test runner.
+
+Before publishing a release, verify the complete workflow in a clean environment:
+
+```text
+Install
+   ↓
+Create/Open Workspace
+   ↓
+Build
+   ↓
+Resolve Inputs
+   ↓
+Compile
+   ↓
+Verify Output
 ```
 
 ---
 
-# Estado atual
+## Current Scope
 
-O Core alcançou uma arquitetura funcionalmente madura, com os principais componentes estruturais implementados:
+The current project focuses on the document-processing core and command-line workflow.
 
-### Concluído
+Included:
 
-* `DocumentEngine`;
-* `TaskScheduler`;
-* sistema de execução baseado em pilha;
-* `BaseAdapter`;
-* `BaseCompilerAdapter`;
-* `AdapterRegistry`;
-* `StaticInspectorRegistry`;
-* análise estática de dependências;
-* resolução de dependências em múltiplos níveis;
-* processamento de Markdown;
-* integração de Excel;
-* integração de Mermaid;
-* compilação para PDF;
-* compilação para HTML;
-* compilação para DOCX;
-* desacoplamento das regras específicas de DOCX;
-* redução de dependências de sistema operacional.
+* Engine
+* Application layer
+* CLI
+* Workspace management
+* Recipe processing
+* Static inspection
+* Dependency resolution
+* Document assembly
+* HTML/PDF/DOCX compilation
 
-Esses avanços representam a transformação do Core de um pipeline linear para um **motor de composição e compilação documental extensível**.
+Not currently covered by this README:
 
----
+* HTTP API
+* Web frontend
+* Browser-based project management
+* Remote execution
 
-# Próximos passos
-
-A próxima etapa prevista é construir as **portas de entrada externas** do sistema.
-
-A arquitetura planejada contempla uma camada HTTP baseada em **FastAPI**, permitindo que o Core seja consumido por aplicações externas sem que a lógica de composição documental precise ser replicada na API.
-
-Conceitualmente:
-
-```text
-                    ┌─────────────────┐
-                    │     Frontend    │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │    FastAPI      │
-                    │      API        │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Document Engine │
-                    │      Core       │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │    Compiler     │
-                    └────────┬────────┘
-                             │
-              ┌──────────────┼──────────────┐
-              ▼              ▼              ▼
-             PDF            DOCX           HTML
-```
-
-A intenção é manter a API como uma **porta de entrada**, e não transformá-la em parte da lógica de negócio do Composer. O Core permanece responsável pela composição e compilação.
-
----
-
-# Filosofia do projeto
-
-O Document Composer parte de uma ideia simples:
-
-> **Um documento complexo deve ser composto a partir de componentes independentes, e não implementado como um único template complexo.**
-
-A arquitetura procura transformar:
-
-```text
-Template monolítico
-       ↓
-muitas regras
-       ↓
-muito acoplamento
-       ↓
-difícil manutenção
-```
-
-em:
-
-```text
-Componentes independentes
-       ↓
-Inspeção
-       ↓
-Resolução
-       ↓
-Composição
-       ↓
-Compilação
-       ↓
-Múltiplos formatos
-```
-
-O resultado é um núcleo que pode evoluir independentemente das interfaces de usuário, APIs e formatos específicos de distribuição.
-
----
-
-## Status
-
-**Core Engine:** 🟢 Implementado
-**Dependency Scheduler:** 🟢 Implementado
-**Static Analysis:** 🟢 Implementado
-**Markdown Composition:** 🟢 Implementado
-**PDF:** 🟢 Implementado
-**DOCX:** 🟢 Implementado
-**HTML:** 🟢 Implementado
-**API / FastAPI:** 🔵 Próxima etapa
-**Frontend:** 🔵 Planejado
+These are separate delivery concerns and should not be considered requirements for using the core engine.
 
 ---
 
 ## License
 
-> A licença do projeto ainda não está definida.
+DocComposer is released under the Apache License. See [LICENSE](LICENSE) for the full license text.
+
+---
+
+## Status
+
+DocComposer's core engine currently provides a stable architectural foundation for recipe-driven document generation, including dependency resolution, static inspection, component adapters, and compilation to HTML, PDF, and DOCX.

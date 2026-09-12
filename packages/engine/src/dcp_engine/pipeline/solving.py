@@ -1,4 +1,5 @@
 from dcp_engine.common.exceptions import GraphNotSolvedException, ResolutionException
+from dcp_engine.runtime.logging.log import logger
 from dcp_engine.solving.solving_context import SolvingContext
 from dcp_engine.runtime.context import EngineContext
 from dcp_engine.runtime.result import SolvingResult
@@ -43,13 +44,18 @@ class SolvingModule:
         
         If solving proccess can't be executed, raises GraphNotSolvedExeception.
         '''
+        logger.info(f'[{session.id}]: Solving graph: inspection, variables and dependencies...')
         result = self._resolve(session)
+        
+        logger.info(f'[{session.id}]: Updating context...')
         self._update_context(session)
 
         if result.completed:
+            logger.info(f'[{session.id}]: Executing adaptation...')
             self._adapt(session)
             # raise GraphNotSolvedException('Graph not solved yet')
 
+        logger.info(f'[{session.id}]: Solving finished. Status={"Ready" if result.completed else "Pending"}')
         return result#session
 
     # def extract

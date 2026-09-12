@@ -6,41 +6,41 @@ from typing import Any, Literal, Optional
 from pydantic import BaseModel, Field
 
 from dcp_api.domain.iteraction import (
-    IterationStatus,
+    IteractionStatus,
     ResolutionKind,
 )
 
 
-class StartIterationRequest(BaseModel):
+class StartIteractionRequest(BaseModel):
     variables: dict[str, Any] = Field(default_factory=dict)
 
 
-class ResolveIterationRequest(BaseModel):
+class ResolveIteractionRequest(BaseModel):
     values: dict[str, Any] = Field(default_factory=dict)
 
 
-class SessionIterationResponse(BaseModel):
+class SessionIteractionResponse(BaseModel):
     project_id: str
     session_id: str
     variables: dict[str, Any] = Field(default_factory=dict)
 
-class SessionIterationListResponse(BaseModel):
-    sessions: list[SessionIterationResponse] = Field(
+class SessionIteractionListResponse(BaseModel):
+    sessions: list[SessionIteractionResponse] = Field(
         default_factory=list
     )
 
 
-class ResolveIterationResponse(BaseModel):
+class ResolveIteractionResponse(BaseModel):
     project_id: str
     session_id: str
-    status: IterationStatus
+    status: IteractionStatus
     # variables: dict[str, Any]
     pending: list[PendingResolutionResponse] = Field(default_factory=list)
     # ready: bool
 
     @property
     def ready(self):
-        return self.status == IterationStatus.READY
+        return self.status == IteractionStatus.READY
 
 class PendingResolutionResponse(BaseModel):
     id: str

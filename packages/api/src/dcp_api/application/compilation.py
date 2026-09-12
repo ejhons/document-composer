@@ -174,14 +174,14 @@ class CompilationNotReadyError(Exception):
 #     def __init__(
 #         self,
 #         *,
-#         iteration_repository,
+#         iteraction_repository,
 #         recipe_repository,
 #         engine,
 #         # compiler_registry,
 #         workspace,
 #     ):
-#         self._iterations = (
-#             iteration_repository
+#         self._iteractions = (
+#             iteraction_repository
 #         )
 
 #         self._recipes = (
@@ -204,7 +204,7 @@ class CompilationNotReadyError(Exception):
 #     ):
 
 #         session = (
-#             self._iterations.get(
+#             self._iteractions.get(
 #                 project_id,
 #                 session_id,
 #             )
@@ -258,10 +258,10 @@ class CompilationNotReadyError(Exception):
 #         )
 
 #         session.status = (
-#             IterationStatus.COMPLETED
+#             IteractionStatus.COMPLETED
 #         )
 
-#         self._iterations.save(
+#         self._iteractions.save(
 #             session
 #         )
 

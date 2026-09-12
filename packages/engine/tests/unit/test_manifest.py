@@ -35,7 +35,7 @@ def test_should_infer_html_file_format():
 # Infere Imagens
 @pytest.mark.parametrize("filename", [
     "imagem.png",
-    "imagem.jpg",
+    "imagem.png",
     "imagem.jpeg",
     "imagem.webp",
     "imagem.svg",

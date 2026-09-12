@@ -6,6 +6,7 @@ from dcp_engine.language.syntax.markdown.atomized_markdown import AtomizedMarkdo
 from dcp_engine.planning.graph.component_node import ComponentNode
 from dcp_engine.runtime.context import EngineContext
 from dcp_engine.runtime.execution.session import ExecutionSession
+from dcp_engine.runtime.logging.log import logger
 
 
 
@@ -23,7 +24,8 @@ class AssemblingModule:
         roots = graph.roots
         cache: dict[str, AtomizedMarkdown] = {}
         document = AtomizedMarkdown()
-
+        
+        logger.info(f'[{session.id}]: Assembling document...')
         for node in roots:
             assembled = self._assemble_node(
                 graph=graph,
@@ -34,6 +36,7 @@ class AssemblingModule:
 
         # Lista encadeada de documentos
         session.fragmented_markdown = document
+        logger.info(f'[{session.id}]: Finished Assembling.')
 
         return session
 

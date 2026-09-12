@@ -24,7 +24,7 @@ class ExecutionSessionRepository(ABC):
     ):
         ...
 
-class IterationService:
+class IteractionService:
     def __init__(
         self,
         *,
@@ -150,7 +150,7 @@ class IterationService:
         return result
 
 
-# class DocumentIterationPort(ABC):
+# class DocumentIteractionPort(ABC):
 #     @abstractmethod
 #     def iterate(
 #         self,
@@ -161,7 +161,7 @@ class IterationService:
 #         ...
 
 
-# class EngineIterationAdapter(DocumentIterationPort):
+# class EngineIteractionAdapter(DocumentIteractionPort):
 #     def __init__(self, engine):
 #         self._engine = engine
 
@@ -180,12 +180,12 @@ class IterationService:
 #         )
 
 
-# class IterationRepository(ABC):
+# class IteractionRepository(ABC):
 #     @abstractmethod
 #     def create(
 #         self,
 #         project_id: str,
-#     ) -> IterationSession:
+#     ) -> IteractionSession:
 #         ...
 
 #     @abstractmethod
@@ -193,13 +193,13 @@ class IterationService:
 #         self,
 #         project_id: str,
 #         session_id: str,
-#     ) -> IterationSession:
+#     ) -> IteractionSession:
 #         ...
 
 #     @abstractmethod
 #     def save(
 #         self,
-#         session: IterationSession,
+#         session: IteractionSession,
 #     ) -> None:
 #         ...
 
@@ -211,11 +211,11 @@ class IterationService:
 #     ) -> None:
 #         ...
     
-# class IterationService:
+# class IteractionService:
 #     def __init__(
 #         self,
 #         *,
-#         repository: IterationRepository,
+#         repository: IteractionRepository,
 #         engine,
 #         recipe_repository,
 #     ):
@@ -228,7 +228,7 @@ class IterationService:
 #         self,
 #         project_id: str,
 #         variables: dict,
-#     ) -> IterationSession:
+#     ) -> IteractionSession:
 #         session = self._repository.create(project_id)
 #         session.update_variables(variables)
 
@@ -243,7 +243,7 @@ class IterationService:
 #         project_id: str,
 #         session_id: str,
 #         values: dict,
-#     ) -> IterationSession:
+#     ) -> IteractionSession:
 
 #         session = (
 #             self._repository.get(
@@ -254,7 +254,7 @@ class IterationService:
 
 #         if (
 #             session.status
-#             == IterationStatus.COMPLETED
+#             == IteractionStatus.COMPLETED
 #         ):
 #             return session
 
@@ -274,7 +274,7 @@ class IterationService:
 #         self,
 #         project_id: str,
 #         session_id: str,
-#     ) -> IterationSession:
+#     ) -> IteractionSession:
 
 #         return self._repository.get(
 #             project_id,
@@ -283,7 +283,7 @@ class IterationService:
 
 #     def _iterate(
 #         self,
-#         session: IterationSession,
+#         session: IteractionSession,
 #     ) -> None:
 
 #         recipe = self._recipe_repository.get(session.project_id)

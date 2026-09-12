@@ -6,13 +6,13 @@ from dcp_engine.solving.resolution.resolution_collector import PendingResolution
 
 def resolve_pending(
     pending: PendingResolution,
-    iteration_port: InteractionPort | None = None
+    iteraction_port: InteractionPort | None = None
 ) -> dict[str, Any]:
     '''
     Resolves project variables, asking the answer to user.
     '''
-    iteration_port = iteration_port or TerminalInteraction.default()
-    return iteration_port.resolve(pending)
+    iteraction_port = iteraction_port or TerminalInteraction.default()
+    return iteraction_port.resolve(pending)
 
 
 
@@ -30,7 +30,7 @@ def resolve_pending(
 #     # Creates session
 #     session = engine.create_session(workspace)
 
-#     # Iteration proccess
+#     # Iteraction proccess
 #     context = session.update_context(user_values)
 #     # Create interaction
 #     iteraction_result = engine.create_iteraction(session)

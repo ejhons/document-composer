@@ -4,6 +4,7 @@ import pypandoc
 from dcp_engine.compilation.compilers.base import BaseCompiler
 from dcp_engine.language.manifests.recipe import RecipeManifest
 from dcp_engine.runtime.execution.session import ExecutionSession
+from dcp_engine.runtime.logging.log import logger
 
 class HtmlCompiler(BaseCompiler):
     def compile(
@@ -24,7 +25,8 @@ class HtmlCompiler(BaseCompiler):
         path = self._execute_pypandoc_html(
             source_markdown_path=source_markdown_path,
             output_path=output_path,
-            manifest=session.manifest,
+            session=session,
+            # manifest=session.manifest,
             standalone=kwargs.get("standalone", True)
         )
         return Path(path)
@@ -43,9 +45,11 @@ class HtmlCompiler(BaseCompiler):
         self,
         source_markdown_path: str, 
         output_path: str,
-        manifest: RecipeManifest,
+        session: ExecutionSession,
+        # manifest: RecipeManifest,
         standalone: bool
     ) -> str:
+        manifest = session.manifest
         style = manifest.style
         # CSS puro e simples aceito pelo xhtml2pdf e navegadores
         css_content = (
@@ -84,7 +88,7 @@ class HtmlCompiler(BaseCompiler):
             "-V", "lang=pt-BR"
         ]
         # Ativa o modo autônomo do Pandoc apenas se não formos enviar para o xhtml2pdf
-        print('standalone', standalone)
+        logger.info(f'standalone {standalone}')
         if standalone:
             extra_args.append("--standalone")
             extra_args.append("--mathjax")
@@ -125,7 +129,7 @@ class HtmlCompiler(BaseCompiler):
         )
 
         # Limpeza de resíduos temporários de build
-        for temp_file in ["engine/src/doc_engine/output/temp_header.html", "engine/src/doc_engine/output/temp_footer.html"]:
+        for temp_file in [session.workspace.dir_from_temp("temp_header.html"), session.workspace.dir_from_temp("temp_footer.html")]:#["engine/src/doc_engine/output/temp_header.html", "engine/src/doc_engine/output/temp_footer.html"]:
             if os.path.exists(temp_file):
                 os.remove(temp_file)
 

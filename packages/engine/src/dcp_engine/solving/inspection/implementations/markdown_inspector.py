@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from dcp_engine.solving.inspection.base import BaseOjbjectInspector
 from dcp_engine.language.parser import MarkdownParser
 from dcp_engine.solving.inspection.result import InspectionResult

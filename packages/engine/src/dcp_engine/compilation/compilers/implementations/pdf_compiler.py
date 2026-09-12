@@ -5,6 +5,7 @@ import pypandoc
 from pathlib import Path
 from xhtml2pdf import pisa
 
+from dcp_engine.runtime.logging.log import logger
 from dcp_engine.compilation.compilers.base import BaseCompiler
 from dcp_engine.runtime.execution.session import ExecutionSession
 
@@ -104,7 +105,7 @@ class PdfCompiler(BaseCompiler):
             standalone=False
         )
         # print(f"[Compiler - PDF] Compiling final vector PDF directly from styled HTML blueprint...")
-        print(f"[Compiler - PDF Native] Converting cleaned HTML template to vector PDF via xhtml2pdf...")
+        logger.debug(f"[Compiler - PDF Native] Converting cleaned HTML template to vector PDF via xhtml2pdf...")
         
         # try:
         # Salva o template no disco temporariamente
@@ -159,7 +160,7 @@ class PdfCompiler(BaseCompiler):
             pisa_status = pisa.CreatePDF(src=final_sanitized_html, dest=pdf_file)
             
         if pisa_status.err:
-            print(f"[Compiler - PDF Warning] xhtml2pdf processing finalized with minor warnings.")
+            logger.debug(f"[Compiler - PDF Warning] xhtml2pdf processing finalized with minor warnings.")
                 
         return output_path
 

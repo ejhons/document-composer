@@ -3,7 +3,6 @@ from typing import Any
 from dcp_application.ports import InteractionPort
 
 
-
 class BuildDocument:
     def __init__(
         self,
@@ -17,12 +16,14 @@ class BuildDocument:
         workspace = self.engine.init_workspace(root)
         session = self.engine.create_session(workspace)
 
-        self.engine.reload_manifest(session)
+        session.manifest = workspace.load_recipe()
+
+        # self.engine.reload_manifest(session)
         # self.engine.reload_metadata(session)
 
         return session
 
-    def interact(self, session, values: dict[str, Any]):# -> IterationResult
+    def interact(self, session, values: dict[str, Any]):# -> IteractionResult
         session.context.update(values)
 
         return self.engine.create_interaction(session)

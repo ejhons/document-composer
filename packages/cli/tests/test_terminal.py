@@ -2,6 +2,7 @@ import typer
 from unittest.mock import Mock
 
 from dcp_cli.interaction.terminal import TerminalInteraction
+from dcp_engine.solving.resolution.resolution_collector import PendingResolution
 
 def test_terminal_resolves_pending_values(monkeypatch):
     prompt = Mock(side_effect=["Everton", "Fortaleza"])
@@ -39,7 +40,10 @@ def test_terminal_resolves_pending_values(monkeypatch):
 def test_terminal_resolves_empty_pending():
     interaction = TerminalInteraction()
 
-    result = interaction.resolve([])
+    result = interaction.resolve(PendingResolution(
+        resolved=False,
+        unchanged=True
+    ))
 
     assert result == {}
 

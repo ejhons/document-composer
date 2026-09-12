@@ -3,6 +3,7 @@ from pathlib import Path
 import pypdfium2 as pdfium
 from dcp_engine.compilation.adapters.base import AssetResult, BaseContentAdapter
 from dcp_engine.planning.graph.assets import Asset, AssetBundle, ComponentContent
+from dcp_engine.runtime.logging.log import logger
 from dcp_engine.runtime.workspace import Workspace
 from dcp_engine.language.parser import MarkdownParser
 from dcp_engine.planning.graph.component_node import ComponentNode
@@ -72,7 +73,7 @@ class PdfRenderer():
         base_name = os.path.splitext(os.path.basename(source_path))[0]
 
         # source_path = Path(source_filename)        
-        print(f"[Adapter - Native] Opening PDF document via embedded Pdfium: {base_name}")
+        logger.info(f"[Adapter - Native] Opening PDF document via embedded Pdfium: {base_name}")
         
         # Abre o documento PDF de forma 100% nativa em Python
         pdf = pdfium.PdfDocument(source_path)

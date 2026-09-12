@@ -9,7 +9,7 @@ class IdGenerator:
     def generate_hex(prefix: str | None = None ) -> str:
         uid = str(uuid4().hex)
         if prefix:
-            return f'{prefix}_{uid}'
+            return f'{prefix}-{uid}'
         
         return uid
     
@@ -18,6 +18,6 @@ class IdGenerator:
         gerador = shortuuid.ShortUUID(alphabet="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")#str(uuid4().hex)
         uid = gerador.random(length=4)
         if prefix:
-            return f'{prefix}_{uid}'
+            return f'{prefix}-{uid}'
         
         return uid

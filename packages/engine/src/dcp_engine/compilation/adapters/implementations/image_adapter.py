@@ -21,10 +21,7 @@ class ImageMarkdownAdapter(BaseContentAdapter):
     def convert(
         self,
         node: ComponentNode,
-        # context: PlanningContext,
         workspace: Workspace,
-        # source_path: str,
-        # output_dir: str,
         **kwargs
     ) -> ComponentContent:
         source_path = Path(node.component.source)
@@ -39,7 +36,9 @@ class ImageMarkdownAdapter(BaseContentAdapter):
             source=result.source, #source_path,
             output=result.output #Path(result['output'])#Path(output_dir) / Path(source_path).name,
         )
+        # print(asset)
         parsed = f"![]({asset.output.as_posix()})"#result['output']})"
+        # print(parsed)
         # parsed = self.parser.parse(
         #     f"![]({asset.id})"
         # )
@@ -71,8 +70,9 @@ class ImageRenderer:
         base_name = os.path.splitext(filename)[0] # Nome do arquivo sem extensão
 
         target_image_path = output_dir.joinpath(filename) #os.path.join(output_dir, filename)
-        os.makedirs(target_image_path, exist_ok=True)
-        shutil.copy(source_path, target_image_path)        
+        # print('path:', target_image_path)
+        os.makedirs(output_dir, exist_ok=True)
+        shutil.copy(source_path, output_dir)        
 
         # Retorna a string Markdown que o compilador final precisa para embutir a imagem
         return AssetResult(

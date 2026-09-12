@@ -1,25 +1,25 @@
 from fastapi import APIRouter, Depends
 
 from dcp_api.api.schemas.iteraction import (
-    StartIterationRequest,
-    ResolveIterationRequest,
-    ResolveIterationResponse,
+    StartIteractionRequest,
+    ResolveIteractionRequest,
+    ResolveIteractionResponse,
 )
 
 router = APIRouter(
-    prefix="/api/projects/{project_id}/iterations",
-    tags=["iterations"],
+    prefix="/api/projects/{project_id}/iteractions",
+    tags=["iteractions"],
 )
 
 
 @router.post(
     "",
-    response_model=ResolveIterationResponse,
+    response_model=ResolveIteractionResponse,
 )
-def start_iteration(
+def start_iteraction(
     project_id: str,
-    request: StartIterationRequest,
-    service = Depends(get_iteration_service),
+    request: StartIteractionRequest,
+    service = Depends(get_iteraction_service),
 ):
 
     session = service.start(
@@ -31,12 +31,12 @@ def start_iteration(
 
 @router.get(
     "/{session_id}",
-    response_model=ResolveIterationResponse,
+    response_model=ResolveIteractionResponse,
 )
-def get_iteration(
+def get_iteraction(
     project_id: str,
     session_id: str,
-    service = Depends(get_iteration_service),
+    service = Depends(get_iteraction_service),
 ):
     '''
     Consulta o estado.
@@ -52,13 +52,13 @@ def get_iteration(
 
 @router.post(
     "/{session_id}/resolve",
-    response_model=ResolveIterationResponse,
+    response_model=ResolveIteractionResponse,
 )
-def resolve_iteration(
+def resolve_iteraction(
     project_id: str,
     session_id: str,
-    request: ResolveIterationRequest,
-    service = Depends(get_iteration_service),
+    request: ResolveIteractionRequest,
+    service = Depends(get_iteraction_service),
 ):
     '''
     Resolve uma iteração
@@ -74,7 +74,7 @@ def resolve_iteration(
 
 def to_response(session):
 
-    return ResolveIterationResponse(
+    return ResolveIteractionResponse(
         session_id=session.id,
         project_id=session.project_id,
         status=session.status,

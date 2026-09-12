@@ -11,7 +11,6 @@ class ParsedMarkdown(BaseModel):
     body: str
     metadata: dict[str, Any] = Field(default_factory=dict)
     fields: dict[str, InputDefinition] = Field(default_factory=dict)
-    # variables: list[InputReference] = Field(default_factory=list)
     _directives_map: dict[int, DirectiveCall] = PrivateAttr(default_factory=dict)
 
     def find_directive_by_id(self, id:int):
@@ -35,8 +34,6 @@ class ParsedMarkdown(BaseModel):
             directive.index : directive
             for directive in value
         }
-
-        # self._directives_map[value.index] = value
 
     @property
     def unique_variables(self) -> dict[str, InputReference]:

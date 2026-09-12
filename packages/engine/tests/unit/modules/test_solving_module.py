@@ -65,7 +65,7 @@ def test_execute_should_call_adapt(monkeypatch, engine_context):
 #     with pytest.raises(GraphNotSolvedException):
 #         result = module.execute(mock)
 
-# def test_resolve_should_finish_on_first_iteration(engine_context):
+# def test_resolve_should_finish_on_first_iteraction(engine_context):
 
 #     module = SolvingModule(engine_context)
 #     module.pending = Mock()

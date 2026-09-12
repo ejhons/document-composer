@@ -35,7 +35,6 @@ class FilesystemFileRepository(FileRepository):
         components = self._components_path(project_id)
 
         if not components.is_dir():
-            print(components)
             raise ProjectNotFoundError(project_id)
 
         target = components / filename

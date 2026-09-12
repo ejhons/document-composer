@@ -1,14 +1,13 @@
 import os
-from pprint import pprint
 import re
 import yaml
 from typing import Any, Dict, Tuple
 
-from dcp_engine.language.syntax.directives import DirectiveArgument, DirectiveCall, Expression, TextSpan
-from dcp_engine.language.syntax.expressions.parser import ExpressionParser
-from dcp_engine.language.syntax.fields import InputDefinition
 from dcp_engine.language.syntax.inputs import InputReference
+from dcp_engine.language.syntax.fields import InputDefinition
 from dcp_engine.language.syntax.parsed_markdown import ParsedMarkdown
+from dcp_engine.language.syntax.expressions.parser import ExpressionParser
+from dcp_engine.language.syntax.directives import DirectiveArgument, DirectiveCall, Expression, TextSpan
 
 
 DIRECTIVE_START = re.compile(
@@ -17,9 +16,6 @@ DIRECTIVE_START = re.compile(
 )
 
 class MarkdownParser:    
-    def __init__(self, expression_parser: ExpressionParser | None = None):
-        self.expression_parser = expression_parser or ExpressionParser()
-
     '''
     Cumpre a função de converter o markdown em ParsedMarkdown.
     A partir do arquivo, identifica:
@@ -29,6 +25,8 @@ class MarkdownParser:
     - metadata
     Cria o objeto ParsedMarkdown
     '''
+    def __init__(self, expression_parser: ExpressionParser | None = None):
+        self.expression_parser = expression_parser or ExpressionParser()
     
     def read_markdown(self, file_path:str) -> str:
         """Extracts YAML front matter and the raw Markdown body from a component file."""
@@ -106,7 +104,7 @@ class MarkdownParser:
         # Extrai o campo 'fields' do dicionário
         fields = metadata.pop('fields', {})
 
-        pprint(fields)
+        # pprint(fields)
 
         return {
             key: InputDefinition(name=key, declared=True, **field)

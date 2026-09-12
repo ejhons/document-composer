@@ -1,7 +1,7 @@
 [project]
 name = "document-composer"
 version = "0.1.0"
-description = "Add your description here"
+description = "Python-based document composition system designed to transform structured **recipes**, reusable document components, templates, data inputs, and external resources into final documents such as **HTML, PDF, and DOCX**."
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [

@@ -1,51 +1,51 @@
-from dcp_api.api.mappers.iteration import IterationMapper
-from dcp_api.api.schemas.iteraction import PendingResolutionResponse, SessionIterationListResponse, SessionIterationResponse
+from dcp_api.api.mappers.iteraction import IteractionMapper
+from dcp_api.api.schemas.iteraction import PendingResolutionResponse, SessionIteractionListResponse, SessionIteractionResponse
 from dcp_api.domain.session import Session
 from fastapi import APIRouter, Depends
 
-from dcp_api.api.dependencies import get_iteration_service
-from dcp_api.application.iteraction import IterationService
+from dcp_api.api.dependencies import get_iteraction_service
+from dcp_api.application.iteraction import IteractionService
 from dcp_api.api.schemas.iteraction import (
-    ResolveIterationResponse,
-    ResolveIterationRequest,
-    StartIterationRequest,
+    ResolveIteractionResponse,
+    ResolveIteractionRequest,
+    StartIteractionRequest,
 )
 
 
 router = APIRouter(
-    prefix="/projects/{project_id}/iteration",
-    tags=["iteration"]
+    prefix="/projects/{project_id}/iteraction",
+    tags=["iteraction"]
 )
-mapper = IterationMapper()
+mapper = IteractionMapper()
 
 
 @router.get(
     "",
-    response_model=SessionIterationListResponse,
+    response_model=SessionIteractionListResponse,
 )
 def list_iteractions(
     project_id: str,
-    service: IterationService = Depends(
-        get_iteration_service
+    service: IteractionService = Depends(
+        get_iteraction_service
     ),
 ):
     sessions = service.list(
         project_id=project_id
     )
-    return mapper.to_session_iteration_list_response(
+    return mapper.to_session_iteraction_list_response(
         sessions=sessions
     )
 
 
 @router.post(
     "",
-    response_model=SessionIterationResponse,
+    response_model=SessionIteractionResponse,
 )
-def start_iteration(
+def start_iteraction(
     project_id: str,
-    request: StartIterationRequest,
-    service: IterationService = Depends(
-        get_iteration_service
+    request: StartIteractionRequest,
+    service: IteractionService = Depends(
+        get_iteraction_service
     ),
 ):
 
@@ -54,14 +54,14 @@ def start_iteration(
         variables=request.variables,
     )
 
-    return mapper.to_session_iteration_response(session)
+    return mapper.to_session_iteraction_response(session)
 
 
 @router.delete("")
 def clear_iteraction(
     project_id: str,
-    service: IterationService = Depends(
-        get_iteration_service
+    service: IteractionService = Depends(
+        get_iteraction_service
     ),
 ):
 
@@ -76,13 +76,13 @@ def clear_iteraction(
 
 @router.get(
     "/{session_id}",
-    response_model=SessionIterationResponse,
+    response_model=SessionIteractionResponse,
 )
-def get_iteration(
+def get_iteraction(
     project_id: str,
     session_id: str,
-    service: IterationService = Depends(
-        get_iteration_service
+    service: IteractionService = Depends(
+        get_iteraction_service
     ),
 ):
 
@@ -91,15 +91,15 @@ def get_iteration(
         session_id=session_id,
     )
 
-    return mapper.to_session_iteration_response(session)
+    return mapper.to_session_iteraction_response(session)
 
 
 @router.delete("/{session_id}/close")
-def close_iteration(
+def close_iteraction(
     project_id: str,
     session_id: str,
-    service: IterationService = Depends(
-        get_iteration_service
+    service: IteractionService = Depends(
+        get_iteraction_service
     ),
 ):
     service.close(
@@ -114,14 +114,14 @@ def close_iteration(
 
 @router.post(
     "/{session_id}/resolve",
-    response_model=ResolveIterationResponse,
+    response_model=ResolveIteractionResponse,
 )
-def resolve_iteration(
+def resolve_iteraction(
     project_id: str,
     session_id: str,
-    request: ResolveIterationRequest,
-    service: IterationService = Depends(
-        get_iteration_service
+    request: ResolveIteractionRequest,
+    service: IteractionService = Depends(
+        get_iteraction_service
     ),
 ):
 
@@ -135,7 +135,7 @@ def resolve_iteration(
         session_id=session_id
     )
 
-    return mapper.to_resolve_iteration_response(
+    return mapper.to_resolve_iteraction_response(
         session=session,
         result=result
         )
@@ -146,8 +146,8 @@ def resolve_iteration(
 def get_variables(
     project_id: str,
     session_id: str,
-    service: IterationService = Depends(
-        get_iteration_service
+    service: IteractionService = Depends(
+        get_iteraction_service
     ),
 ):
     session = service.get(
@@ -158,9 +158,9 @@ def get_variables(
 
 
 
-# def to_response(session) -> ResolveIterationResponse:
+# def to_response(session) -> ResolveIteractionResponse:
 
-#     return ResolveIterationResponse(
+#     return ResolveIteractionResponse(
 #         session_id=session.id,
 #         status=result.solved,
 #         pending=[

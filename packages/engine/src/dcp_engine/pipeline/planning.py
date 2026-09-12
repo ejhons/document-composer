@@ -3,7 +3,7 @@ from dcp_engine.planning.graph.graph import RecipeGraph
 from dcp_engine.planning.graph.builder import RecipeGraphBuilder
 from dcp_engine.runtime.execution.session import ExecutionSession
 
-from dcp_engine.runtime.logging.logger import logger
+from dcp_engine.runtime.logging.log import logger
 
 
 
@@ -26,7 +26,6 @@ class PlanningModule:
         '''
         Creates graph, neccessary for planning operations.
         '''
-        logger.info(f'building graph...')
         return self.builder_cls(
             resource_resolver=self.resource_resolver
         ).build(
@@ -42,6 +41,7 @@ class PlanningModule:
         Transforms recipe manifest into graph object ready for solving.
         Updates session.graph
         '''
+        logger.info(f'[{session.id}]: building graph...')
         session.graph = self._build_graph(session)
-        logger.info('graph successfully build.')
+        logger.info(f'[{session.id}]: Graph successfully build.')
         return session

@@ -2,6 +2,7 @@
 from typing import Any, Optional
 from pydantic import BaseModel, Field
 
+from dcp_engine.common.generator import IdGenerator
 from dcp_engine.runtime.workspace import Workspace
 from dcp_engine.planning.graph.graph import RecipeGraph
 # from dcp_engine.runtime.execution.metadata import Metadata
@@ -12,6 +13,9 @@ from dcp_engine.language.syntax.markdown.atomized_markdown import AtomizedMarkdo
 
 class ExecutionSession(BaseModel):
     workspace: Workspace
+    id: str = Field(default_factory=lambda:
+        IdGenerator.generate('s')
+    )
     
     context: ExecutionContext = Field( 
         default_factory=ExecutionContext
@@ -24,11 +28,4 @@ class ExecutionSession(BaseModel):
     graph:Optional[RecipeGraph] = None
     fragmented_markdown: Optional[AtomizedMarkdown] = None
 
-    # def update_context(self):
-    #     if self.graph is not None:
-    #         self.graph.parents
-
-
-    # @property
-    # def context(self):
-    #     return self.context
+    

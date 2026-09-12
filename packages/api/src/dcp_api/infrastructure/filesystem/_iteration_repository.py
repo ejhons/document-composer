@@ -7,15 +7,15 @@ from uuid import uuid4
 from warnings import deprecated
 
 from dcp_api.domain.iteraction import (
-    IterationSession,
-    IterationStatus,
+    IteractionSession,
+    IteractionStatus,
     PendingResolutionDomain,
     ResolutionKind,
 )
 
 @deprecated
-class FilesystemIterationRepository:
-    FILE_NAME = "iteration.json"
+class FilesystemIteractionRepository:
+    FILE_NAME = "iteraction.json"
 
     def __init__(self, workspace):
         self._workspace = workspace
@@ -23,9 +23,9 @@ class FilesystemIterationRepository:
     def create(
         self,
         project_id: str,
-    ) -> IterationSession:
+    ) -> IteractionSession:
 
-        session = IterationSession(
+        session = IteractionSession(
             id=uuid4().hex,
             project_id=project_id,
         )
@@ -38,7 +38,7 @@ class FilesystemIterationRepository:
         self,
         project_id: str,
         session_id: str,
-    ) -> IterationSession:
+    ) -> IteractionSession:
 
         path = self._path(
             project_id,
@@ -47,7 +47,7 @@ class FilesystemIterationRepository:
 
         if not path.exists():
             raise FileNotFoundError(
-                f"Iteration session not found: "
+                f"Iteraction session not found: "
                 f"{session_id}"
             )
 
@@ -57,10 +57,10 @@ class FilesystemIterationRepository:
             )
         )
 
-        return IterationSession(
+        return IteractionSession(
             id=data["id"],
             project_id=data["project_id"],
-            status=IterationStatus(data["status"]),
+            status=IteractionStatus(data["status"]),
             variables=data.get(
                 "variables",
                 {},
@@ -97,7 +97,7 @@ class FilesystemIterationRepository:
 
     def save(
         self,
-        session: IterationSession,
+        session: IteractionSession,
     ) -> None:
 
         path = self._path(
@@ -143,7 +143,7 @@ class FilesystemIterationRepository:
         return (
             self._workspace
             .project_path(project_id)
-            / ".iteration"
+            / ".iteraction"
             / session_id
             / self.FILE_NAME
         )
