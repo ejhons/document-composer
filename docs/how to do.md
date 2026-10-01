@@ -81,7 +81,7 @@ dcp start -i
 dcp compile
 ```
 
-```
+```Python
 # Reads recipe manifest
 loader = ManifestLoader(
   workspace.recipe_path('manifest.json')

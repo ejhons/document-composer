@@ -1,0 +1,15 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dcp-application"
+version = "0.1.0"
+description = "Application-level orchestration around the DocComposer Engine.Preferred integration point for interfaces such as the CLI."
+readme = "README.md"
+authors = [{ name = "ejhons", email = "ejhons.mail@gmail.com" }]
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.hatch.build.targets.wheel]
+packages = ['src/dcp_application']

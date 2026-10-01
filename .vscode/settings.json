@@ -12,7 +12,7 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python-envs.defaultEnvManager": "ms-python.python:venv",
+    "python-envs.defaultEnvManager": "ms-python.python:system",
     "workbench.colorCustomizations": {
         // "editor.background": "#1e1e1e",
         // "activityBar.background": "#000000",

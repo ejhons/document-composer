@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dcp-engine"
+version = "0.1.0"
+description = "Core document-processing library of the DocComposer project."
+readme = "README.md"
+authors = [{ name = "ejhons", email = "ejhons.mail@gmail.com" }]
+requires-python = ">=3.11"
+dependencies = [
+    "jinja2",
+    "pydantic",
+    "networkx",
+    "python-docx",
+    "pypandoc",
+    "markdown",
+    "shortuuid",
+    "pandas",
+    "requests",
+    "rich",
+    "pypdfium2",
+    "xhtml2pdf",
+    "pyyaml>=6.0.3",
+    "openpyxl>=3.1.5",
+    "tabulate>=0.10.0",
+    "pypdf>=6.16.2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ['src/dcp_engine']
